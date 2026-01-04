@@ -1,0 +1,8 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+psycopg2-binary
+gunicorn
+django-cors-headers
+python-dotenv
+pillow

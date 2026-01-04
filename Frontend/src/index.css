@@ -1,0 +1,25 @@
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --bg: #0f172a;
+  --card-bg: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.25);
+  --text: #f8fafc;
+  --muted: #cbd5f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  background: radial-gradient(
+    circle at top,
+    #1e293b,
+    #020617
+  );
+  color: var(--text);
+  min-height: 100vh;
+}
