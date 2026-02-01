@@ -67,13 +67,14 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-     "https://mess-cards-cm5u.vercel.app",  # add later
+    "https://mess-cards-xyrg.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
-     "https://mess-cards-cm5u.vercel.app",  # add real one after deploy
+    "https://mess-cards-xyrg.vercel.app",
 ]
+
 
 
 
