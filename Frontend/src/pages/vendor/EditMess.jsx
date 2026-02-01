@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import VendorHeader from "../../components/VendorHeader";
+import BackButton from "../../components/BackButton";
+import { toast } from "react-toastify";
 
 export default function EditMess() {
   const { messId } = useParams();
@@ -22,7 +24,7 @@ export default function EditMess() {
         setLoading(false);
       })
       .catch(() => {
-        alert("Failed to load mess");
+        toast.error("Failed to load mess details");
         navigate("/vendor");
       });
   }, [messId, navigate]);
@@ -37,9 +39,11 @@ export default function EditMess() {
         location,
       });
 
+
+      toast.success("Mess details updated successfully");
       navigate("/vendor");
     } catch (err) {
-      alert("Update failed");
+      toast.error("Update failed");
     }
   };
 
@@ -48,6 +52,7 @@ export default function EditMess() {
   return (
     <>
       <VendorHeader />
+      <BackButton/>
 
       <form onSubmit={submit} style={form}>
         <h2 style={{ textAlign: "center" }}>Edit Mess</h2>

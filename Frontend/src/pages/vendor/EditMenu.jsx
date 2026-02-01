@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import VendorHeader from "../../components/VendorHeader";
+import BackButton from "../../components/BackButton"; // ✅ ADD
 
 export default function EditMenu() {
   const { messId, menuId } = useParams();
@@ -42,52 +43,51 @@ export default function EditMenu() {
   };
 
   return (
-  <>
-    <VendorHeader />
+    <>
+      <VendorHeader />
+      <BackButton /> {/* ✅ BACK BUTTON */}
 
-    <div className="page-container">
-      <div className="form-card animate-in">
-        <h2>Edit Menu Item</h2>
+      <div className="page-container">
+        <div className="form-card animate-in">
+          <h2>Edit Menu Item</h2>
 
-        <form onSubmit={submit} className="grid-form">
+          <form onSubmit={submit} className="grid-form">
+            {/* ITEM NAME */}
+            <input
+              placeholder="Item name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
 
-          {/* ITEM NAME */}
-          <input
-            placeholder="Item name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+            {/* PRICE */}
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
 
-          {/* PRICE */}
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
+            {/* MEAL TYPE */}
+            <select
+              value={mealType}
+              onChange={(e) => setMealType(e.target.value)}
+              required
+            >
+              <option value="">Select Meal</option>
+              <option value="BREAKFAST">Breakfast</option>
+              <option value="LUNCH">Lunch</option>
+              <option value="DINNER">Dinner</option>
+            </select>
 
-          {/* MEAL TYPE */}
-          <select
-            value={mealType}
-            onChange={(e) => setMealType(e.target.value)}
-            required
-          >
-            <option value="">Select Meal</option>
-            <option value="BREAKFAST">Breakfast</option>
-            <option value="LUNCH">Lunch</option>
-            <option value="DINNER">Dinner</option>
-          </select>
-
-          <button className="primary-btn" type="submit">
-            Update Menu
-          </button>
-        </form>
+            <button className="primary-btn" type="submit">
+              Update Menu
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-  </>
-);
-
+    </>
+  );
 }

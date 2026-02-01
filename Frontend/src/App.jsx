@@ -20,7 +20,7 @@ import StudentProfile from "./pages/student/StudentProfile";
 export default function App() {
   return (
     <>
-      {/* 🔔 Global Toasts */}
+      {/*Global Toasts */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -30,7 +30,7 @@ export default function App() {
         draggable
       />
 
-      {/* 🌐 Routes */}
+      {/* Routes */}
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />

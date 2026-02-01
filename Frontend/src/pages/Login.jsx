@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import BackButton from "../components/BackButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,9 +25,11 @@ export default function Login() {
       localStorage.setItem("role", me.data.role);
 
       if (me.data.role === "OWNER") {
-        navigate("/vendor");
+        navigate("/vendor", { replace: true });
+
       } else {
-        navigate("/student");
+        navigate("/student", { replace: true });
+
       }
     } catch {
       setError("Invalid email or password");

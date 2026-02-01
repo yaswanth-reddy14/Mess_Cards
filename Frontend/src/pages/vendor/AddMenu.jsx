@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import VendorHeader from "../../components/VendorHeader";
-
+import BackButton from "../../components/BackButton";
 
 export default function AddMenu() {
   const { messId } = useParams();
@@ -25,58 +25,58 @@ export default function AddMenu() {
       });
 
       navigate(`/vendor/${messId}/menus`);
-    } catch (err) {
+    } catch {
       setError("Failed to add menu item");
     }
   };
 
   return (
-  <>
-    <VendorHeader />
+    <>
+      <VendorHeader />
+      <BackButton />
 
-    <div className="page-container">
-      <div className="form-card animate-in">
-        <h2>Add Menu Item</h2>
+      <div className="page-container">
+        <div className="form-card animate-in">
+          <h2>Add Menu Item</h2>
 
-        {error && <div className="error">{error}</div>}
+          {error && <div className="error">{error}</div>}
 
-        <form onSubmit={submit} className="grid-form">
+          <form onSubmit={submit} className="grid-form">
+            {/* MEAL TYPE */}
+            <select
+              value={mealType}
+              onChange={(e) => setMealType(e.target.value)}
+              required
+            >
+              <option value="BREAKFAST">Breakfast</option>
+              <option value="LUNCH">Lunch</option>
+              <option value="DINNER">Dinner</option>
+            </select>
 
-          {/* MEAL TYPE */}
-          <select
-            value={mealType}
-            onChange={(e) => setMealType(e.target.value)}
-            required
-          >
-            <option value="BREAKFAST">Breakfast</option>
-            <option value="LUNCH">Lunch</option>
-            <option value="DINNER">Dinner</option>
-          </select>
+            {/* ITEM NAME */}
+            <input
+              placeholder="Item name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
 
-          {/* ITEM NAME */}
-          <input
-            placeholder="Item name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+            {/* PRICE */}
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
 
-          {/* PRICE */}
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
-
-          <button className="primary-btn" type="submit">
-            Add Menu Item
-          </button>
-        </form>
+            <button className="primary-btn" type="submit">
+              Add Menu Item
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
 }

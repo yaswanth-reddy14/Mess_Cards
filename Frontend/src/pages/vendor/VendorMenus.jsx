@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import VendorHeader from "../../components/VendorHeader";
+import BackButton from "../../components/BackButton";
 
 export default function VendorMenus() {
   const { messId } = useParams();
@@ -24,62 +26,67 @@ export default function VendorMenus() {
     }
   };
 
-  const grouped = {
-    BREAKFAST: [],
-    LUNCH: [],
-    DINNER: [],
-  };
+  const grouped = { BREAKFAST: [], LUNCH: [], DINNER: [] };
 
   menus.forEach((menu) => {
-    if (grouped[menu.meal_type]) {
-      grouped[menu.meal_type].push(menu);
-    }
+    if (grouped[menu.meal_type]) grouped[menu.meal_type].push(menu);
   });
 
   return (
-    <div>
-      <h2>Menus</h2>
+    <>
+      <VendorHeader />
 
-      <button 
-        className="btn-primary"
-      onClick={() => navigate(`/vendor/${messId}/add-menu`)}>
-         + Add Menu
-      </button>
+      <div className="page-container vendor-page">
+        <BackButton />
 
-      <div className="menu-cards three-col">
-        {["BREAKFAST", "LUNCH", "DINNER"].map((meal) => (
-          <div className="menu-card" key={meal}>
-            <h3>{meal}</h3>
+        {/* PAGE HEADER */}
+        <div className="page-header">
+          <h2>Menus</h2>
+          <button
+            className="btn-primary"
+            onClick={() => navigate(`/vendor/${messId}/add-menu`)}
+          >
+            + Add Menu
+          </button>
+        </div>
 
-            {grouped[meal].length === 0 && <p>No items</p>}
+        {/* CONTENT */}
+        <div className="menu-cards three-col">
+          {["BREAKFAST", "LUNCH", "DINNER"].map((meal) => (
+            <div className="menu-card" key={meal}>
+              <h3>{meal}</h3>
 
-            {grouped[meal].map((item) => (
-              <div className="menu-item" key={item.id}>
-                <span>
-                  {item.name} – ₹{item.price}
-                </span>
+              {grouped[meal].length === 0 && <p>No items</p>}
 
-                <div>
-                  <button
-                    className="btn-edit"
-                    onClick={() =>
-                      navigate(`/vendor/${messId}/menu/${item.id}/edit`)
-                    }
-                  >
-                   ✏️ Edit
-                  </button>
+              {grouped[meal].map((item) => (
+                <div className="menu-item" key={item.id}>
+                  <span>
+                    {item.name} – ₹{item.price}
+                  </span>
 
-                  <button 
-                    className="btn-delete"
-                  onClick={() => deleteMenu(item.id)}>
-                   🗑️ Delete
-                  </button>
+                  <div className="menu-actions">
+                    <button
+                      className="btn-edit"
+                      onClick={() =>
+                        navigate(`/vendor/${messId}/menu/${item.id}/edit`)
+                      }
+                    >
+                      ✏️ Edit
+                    </button>
+
+                    <button
+                      className="btn-delete"
+                      onClick={() => deleteMenu(item.id)}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))}
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1048,3 +1048,62 @@ button:active::after {
 }
 
 
+
+/* PAGE CONTAINER */
+.vendor-page {
+  padding-top: 20px;
+}
+
+/* HEADER ROW */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 30px;
+}
+
+/* MENU ACTION BUTTONS */
+.menu-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ENSURE BACK BUTTON SPACING */
+.back-btn {
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 14px;
+  margin-bottom: 18px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(15, 23, 42, 0.85);
+  color: #60a5fa;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.back-btn:hover {
+  background: rgba(37, 99, 235, 0.15);
+  color: #93c5fd;
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: scale(0.96);
+}
+
+.back-arrow {
+  font-size: 16px;
+}
