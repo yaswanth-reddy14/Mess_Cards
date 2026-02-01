@@ -3,16 +3,16 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 
-# =========================
+
 # BASE DIR & ENV
-# =========================
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-# =========================
+
 # SECURITY
-# =========================
+
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -20,9 +20,9 @@ DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = ["*"]  # safe behind proxy (Render/Vercel)
 
-# =========================
+
 # APPLICATIONS
-# =========================
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -43,9 +43,9 @@ INSTALLED_APPS = [
     "recommendations",
 ]
 
-# =========================
+
 # MIDDLEWARE
-# =========================
+
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -64,9 +64,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# =========================
+
 # URLS / TEMPLATES
-# =========================
+
 
 ROOT_URLCONF = "config.urls"
 
@@ -88,9 +88,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# =========================
+
 # DATABASE (POSTGRESQL)
-# =========================
+
 
 DATABASES = {
     "default": {
@@ -103,15 +103,15 @@ DATABASES = {
     }
 }
 
-# =========================
+
 # CUSTOM USER MODEL
-# =========================
+
 
 AUTH_USER_MODEL = "users.User"
 
-# =========================
+
 # PASSWORD VALIDATION
-# =========================
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -122,27 +122,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# =========================
+
 # I18N
-# =========================
+
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# =========================
+
 # STATIC FILES
-# =========================
+
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# =========================
+
 # DRF + JWT
-# =========================
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -154,7 +154,14 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    # Long access token (example: 30 days)
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+
+    # Refresh token longer than access token
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
+
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+
     "AUTH_HEADER_TYPES": ("Bearer",),
 }

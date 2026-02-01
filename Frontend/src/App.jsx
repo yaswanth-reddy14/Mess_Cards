@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -10,36 +12,44 @@ import AddMess from "./pages/vendor/AddMess";
 import AddMenu from "./pages/vendor/AddMenu";
 import EditMenu from "./pages/vendor/EditMenu";
 import EditMess from "./pages/vendor/EditMess";
+
 import StudentDashboard from "./pages/student/StudentDashboard";
 import MessDetails from "./pages/student/MessDetails";
-
 import StudentProfile from "./pages/student/StudentProfile";
-
-
 
 export default function App() {
   return (
-    <Routes>
-      <Route path= "/" element= {<Login/>} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+    <>
+      {/* 🔔 Global Toasts */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
 
-      {/* Vendor */}
-      <Route path="/vendor" element={<VendorMesses />} />
-      <Route path="/vendor/profile" element={<VendorProfile />} />
-      <Route path="/vendor/add-mess" element={<AddMess />} />
-      <Route path="/vendor/:messId/menus" element={<VendorMenus />} />
-      <Route path="/vendor/:messId/add-menu" element={<AddMenu />} />
-      <Route path="/vendor/:messId/menu/:menuId/edit" element={<EditMenu />} />
-      <Route path="/vendor/:messId/edit" element={<EditMess />} />
+      {/* 🌐 Routes */}
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      {/* Student */}
-      <Route path="/student" element={<StudentDashboard />} />
-      <Route path="/student/mess/:messId" element={<MessDetails />} />
+        {/* Vendor */}
+        <Route path="/vendor" element={<VendorMesses />} />
+        <Route path="/vendor/profile" element={<VendorProfile />} />
+        <Route path="/vendor/add-mess" element={<AddMess />} />
+        <Route path="/vendor/:messId/menus" element={<VendorMenus />} />
+        <Route path="/vendor/:messId/add-menu" element={<AddMenu />} />
+        <Route path="/vendor/:messId/menu/:menuId/edit" element={<EditMenu />} />
+        <Route path="/vendor/:messId/edit" element={<EditMess />} />
 
-      <Route path="/student/profile" element={<StudentProfile />} />
-
-      
-    </Routes>
+        {/* Student */}
+        <Route path="/student" element={<StudentDashboard />} />
+        <Route path="/student/mess/:messId" element={<MessDetails />} />
+        <Route path="/student/profile" element={<StudentProfile />} />
+      </Routes>
+    </>
   );
 }
