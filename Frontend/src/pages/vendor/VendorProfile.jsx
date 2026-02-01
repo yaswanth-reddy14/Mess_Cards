@@ -31,8 +31,8 @@ export default function VendorProfile() {
 
   // UPDATE PHONE
   const updatePhone = async () => {
-    if (!phone.trim()) {
-      toast.error("Phone number cannot be empty");
+    if (!/^\d{10}$/.test(phone)) {
+      toast.error("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -48,7 +48,7 @@ export default function VendorProfile() {
     }
   };
 
-  // CHANGE PASSWORD (FULL FIX)
+  // CHANGE PASSWORD
   const changePassword = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       toast.error("All password fields are required");
@@ -79,7 +79,7 @@ export default function VendorProfile() {
       const data = err.response?.data;
 
       if (data?.old_password?.length) {
-        toast.error(data.old_password[0]); // ✅ exact backend message
+        toast.error(data.old_password[0]);
       } else if (data?.detail) {
         toast.error(data.detail);
       } else if (data?.error) {
@@ -135,7 +135,6 @@ export default function VendorProfile() {
 
         {/* RIGHT CONTENT */}
         <div className="profile-info">
-
           <h3 className="section-title">Account Overview</h3>
 
           <div className="info-row">
@@ -161,8 +160,11 @@ export default function VendorProfile() {
             <label>Phone Number</label>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter phone number"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 10) setPhone(value);
+              }}
+              placeholder="Enter 10-digit phone number"
             />
           </div>
 

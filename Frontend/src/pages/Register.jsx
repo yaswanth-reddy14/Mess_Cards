@@ -6,6 +6,7 @@ import "../App.css";
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("STUDENT");
@@ -17,10 +18,17 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
+    // 🔒 Frontend validation — strict
+    if (!/^\d{10}$/.test(phone)) {
+      setError("Phone number must be exactly 10 digits");
+      return;
+    }
+
     try {
       await api.post("/auth/register/", {
         name,
         email,
+        phone,
         password,
         confirm_password: confirmPassword,
         role,
@@ -28,19 +36,20 @@ export default function Register() {
 
       navigate("/login");
     } catch (err) {
-  const data = err.response?.data;
+      const data = err.response?.data;
 
-  if (data?.email) {
-    setError(data.email[0]); // "Email already exists"
-  } else if (data?.confirm_password) {
-    setError(data.confirm_password); // "Passwords do not match"
-  } else if (data?.non_field_errors) {
-    setError(data.non_field_errors[0]);
-  } else {
-    setError("Registration failed");
-  }
-}
-
+      if (data?.phone) {
+        setError(data.phone[0]); // e.g. "Phone number already exists"
+      } else if (data?.email) {
+        setError(data.email[0]);
+      } else if (data?.confirm_password) {
+        setError(data.confirm_password);
+      } else if (data?.non_field_errors) {
+        setError(data.non_field_errors[0]);
+      } else {
+        setError("Registration failed");
+      }
+    }
   };
 
   return (
@@ -63,6 +72,18 @@ export default function Register() {
           placeholder="Email Address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="tel"
+          placeholder="Phone Number (10 digits)"
+          value={phone}
+          onChange={(e) => {
+            // allow only digits
+            const value = e.target.value.replace(/\D/g, "");
+            if (value.length <= 10) setPhone(value);
+          }}
           required
         />
 
