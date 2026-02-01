@@ -25,6 +25,7 @@ ALLOWED_HOSTS = [
 ]
 
 
+
 # APPLICATIONS
 
 
@@ -64,12 +65,16 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = False
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://your-frontend-domain.vercel.app",  # add later
+]
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://YOUR-VERCEL-APP.vercel.app",
-
+    "https://your-frontend-domain.vercel.app",  # add real one after deploy
 ]
+
 
 
 # URLS / TEMPLATES
