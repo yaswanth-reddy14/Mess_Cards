@@ -7,6 +7,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("STUDENT");
   const [error, setError] = useState("");
 
@@ -21,13 +22,25 @@ export default function Register() {
         name,
         email,
         password,
+        confirm_password: confirmPassword,
         role,
       });
 
       navigate("/login");
     } catch (err) {
-      setError("Registration failed");
-    }
+  const data = err.response?.data;
+
+  if (data?.email) {
+    setError(data.email[0]); // "Email already exists"
+  } else if (data?.confirm_password) {
+    setError(data.confirm_password); // "Passwords do not match"
+  } else if (data?.non_field_errors) {
+    setError(data.non_field_errors[0]);
+  } else {
+    setError("Registration failed");
+  }
+}
+
   };
 
   return (
@@ -58,6 +71,14 @@ export default function Register() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
 
