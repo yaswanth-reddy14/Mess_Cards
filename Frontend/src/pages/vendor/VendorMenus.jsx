@@ -41,14 +41,20 @@ export default function VendorMenus() {
 
         {/* PAGE HEADER */}
         <div className="page-header">
-          <h2>Menus</h2>
-          <button
-            className="btn-primary"
-            onClick={() => navigate(`/vendor/${messId}/add-menu`)}
-          >
-            + Add Menu
-          </button>
-        </div>
+  <div className="page-title">
+    <h2>Menus</h2>
+  </div>
+
+  <div className="page-actions">
+    <button
+      className="btn-primary"
+      onClick={() => navigate(`/vendor/${messId}/add-menu`)}
+    >
+      + Add Menu
+    </button>
+  </div>
+</div>
+
 
         {/* CONTENT */}
         <div className="menu-cards three-col">
