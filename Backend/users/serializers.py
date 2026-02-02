@@ -44,3 +44,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("id", "name", "email", "role", "phone", "location")
         read_only_fields = ("email", "role")
+
+    def validate_phone(self, value):
+        if value is None:
+            return value
+
+        if not value.isdigit():
+            raise serializers.ValidationError("Phone number must contain only digits")
+
+        if len(value) != 10:
+            raise serializers.ValidationError("Phone number must be exactly 10 digits")
+
+        return value

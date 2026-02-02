@@ -1,6 +1,12 @@
 import uuid
+import random
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group, Permission
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    Group,
+    Permission
+)
 from .manager import UserManager
 
 
@@ -15,7 +21,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
-    phone = models.CharField(max_length=15, blank=True, null=True)
+    #  STRICT 10-digit phone (required for OTP)
+    phone = models.CharField(max_length=10, unique=True)
     location = models.CharField(max_length=100, blank=True, null=True)
 
     groups = models.ManyToManyField(Group, blank=True)
@@ -25,9 +32,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "role"]   
+    REQUIRED_FIELDS = ["name", "role"]
 
     objects = UserManager()
 
     def __str__(self):
         return self.email
+
+
+#  OTP MODEL 
+class EmailOTP(models.Model):
+    email = models.EmailField(unique=True)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email} - {self.otp}"
+
+# OTP GENERATOR (USED IN SERIALIZER / VIEW)
+def generate_otp():
+    return str(random.randint(100000, 999999))

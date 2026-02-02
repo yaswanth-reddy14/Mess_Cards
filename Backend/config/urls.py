@@ -21,5 +21,8 @@ urlpatterns = [
 
     # Recommendations
     path("api/recommendations/", include("recommendations.urls")),
+
+    path("api/auth/", include("users.urls")),
+
     
 ]

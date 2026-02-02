@@ -2,118 +2,187 @@ import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import { toast } from "react-toastify";
 
 export default function Register() {
+  const navigate = useNavigate();
+
+  // STEP CONTROL
+  const [step, setStep] = useState(1); // 1 = form, 2 = otp
+
+  // FORM FIELDS
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("STUDENT");
-  const [error, setError] = useState("");
 
-  const navigate = useNavigate();
+  // OTP
+  const [otp, setOtp] = useState("");
 
-  const submit = async (e) => {
+  // UI STATE
+  const [loading, setLoading] = useState(false);
+
+  /* =========================
+     STEP 1: SEND EMAIL OTP
+  ========================= */
+  const sendOtp = async (e) => {
     e.preventDefault();
-    setError("");
 
-    // 🔒 Frontend validation — strict
-    if (!/^\d{10}$/.test(phone)) {
-      setError("Phone number must be exactly 10 digits");
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
-      await api.post("/auth/register/", {
+      setLoading(true);
+
+      await api.post("/auth/send-otp/", {
+        email: email.trim(),
+      });
+
+      toast.success("OTP sent to your email");
+      setStep(2);
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* =========================
+     STEP 2: VERIFY OTP + REGISTER
+  ========================= */
+  const verifyOtpAndRegister = async (e) => {
+    e.preventDefault();
+
+    if (!/^\d{6}$/.test(otp)) {
+      toast.error("Enter a valid 6-digit OTP");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await api.post("/auth/verify-otp-register/", {
         name,
-        email,
-        phone,
+        email: email.trim(),
         password,
         confirm_password: confirmPassword,
         role,
+        otp,
       });
 
+      toast.success("Registration successful");
       navigate("/login");
     } catch (err) {
       const data = err.response?.data;
 
-      if (data?.phone) {
-        setError(data.phone[0]); // e.g. "Phone number already exists"
-      } else if (data?.email) {
-        setError(data.email[0]);
-      } else if (data?.confirm_password) {
-        setError(data.confirm_password);
-      } else if (data?.non_field_errors) {
-        setError(data.non_field_errors[0]);
-      } else {
-        setError("Registration failed");
-      }
+      toast.error(
+        data?.error ||
+        data?.email?.[0] ||
+        data?.confirm_password ||
+        data?.password?.[0] ||
+        "Registration failed"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
-      <form className="auth-card" onSubmit={submit}>
-        <h2>Create Account</h2>
+      <form
+        className="auth-card"
+        onSubmit={step === 1 ? sendOtp : verifyOtpAndRegister}
+      >
+        <h2>{step === 1 ? "Create Account" : "Verify Email OTP"}</h2>
 
-        {error && <p className="error">{error}</p>}
+        {/* STEP 1 — REGISTER FORM */}
+        {step === 1 && (
+          <>
+            <input
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-        <input
-          type="tel"
-          placeholder="Phone Number (10 digits)"
-          value={phone}
-          onChange={(e) => {
-            // allow only digits
-            const value = e.target.value.replace(/\D/g, "");
-            if (value.length <= 10) setPhone(value);
-          }}
-          required
-        />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+            <select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="STUDENT">Student</option>
+              <option value="OWNER">Mess Owner</option>
+            </select>
 
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
+            <button type="submit" disabled={loading}>
+              {loading ? "Sending OTP..." : "Send OTP to Email"}
+            </button>
+          </>
+        )}
 
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="STUDENT">Student</option>
-          <option value="OWNER">Mess Owner</option>
-        </select>
+        {/* STEP 2 — OTP VERIFY */}
+        {step === 2 && (
+          <>
+            <input
+              placeholder="Enter 6-digit OTP"
+              value={otp}
+              onChange={(e) =>
+                setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
+              required
+            />
 
-        <button type="submit">Register</button>
+            <button type="submit" disabled={loading}>
+              {loading ? "Verifying..." : "Verify & Register"}
+            </button>
 
-        <p className="auth-footer">
-          Already have an account?{" "}
-          <span onClick={() => navigate("/login")}>Login</span>
-        </p>
+            <p
+              className="auth-footer"
+              style={{ cursor: "pointer" }}
+              onClick={() => setStep(1)}
+            >
+              ← Edit details
+            </p>
+          </>
+        )}
       </form>
     </div>
   );

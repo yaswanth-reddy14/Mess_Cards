@@ -26,22 +26,32 @@ export default function StudentProfile() {
 
   // UPDATE PHONE
   const updatePhone = async () => {
-    if (!phone.trim()) {
-      toast.error("Phone number cannot be empty");
-      return;
-    }
+  if (!phone.trim()) {
+    toast.error("Phone number cannot be empty");
+    return;
+  }
 
-    try {
-      setSaving(true);
-      const res = await api.patch("auth/me/", { phone });
-      setUser(res.data);
-      toast.success("Phone updated successfully");
-    } catch {
-      toast.error("Failed to update phone");
-    } finally {
-      setSaving(false);
-    }
-  };
+  if (!/^\d{10}$/.test(phone)) {
+    toast.error("Phone number must be exactly 10 digits");
+    return;
+  }
+
+  try {
+    setSaving(true);
+    const res = await api.patch("auth/me/", { phone });
+    setUser(res.data);
+    toast.success("Phone updated successfully");
+  } catch (err) {
+    const msg =
+      err.response?.data?.phone?.[0] ||
+      err.response?.data?.detail ||
+      "Failed to update phone";
+    alert(msg);
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   // CHANGE PASSWORD (FULL FIX)
   const changePassword = async () => {
