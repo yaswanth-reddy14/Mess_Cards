@@ -7,3 +7,4 @@ django-cors-headers
 python-dotenv
 pillow
 whitenoise
+dj-database-url
