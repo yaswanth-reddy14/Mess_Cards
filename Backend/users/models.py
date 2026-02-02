@@ -22,7 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
     #  STRICT 10-digit phone (required for OTP)
-    phone = models.CharField(max_length=10, unique=True)
+    phone = models.CharField(max_length=10, blank=True , null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
 
     groups = models.ManyToManyField(Group, blank=True)
