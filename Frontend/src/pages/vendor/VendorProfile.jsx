@@ -15,6 +15,10 @@ export default function VendorProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // 🔥 NEW: delete confirmation modal
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   // LOAD PROFILE + MESSES
   useEffect(() => {
     api.get("auth/me/")
@@ -75,31 +79,24 @@ export default function VendorProfile() {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err) {
-      const data = err.response?.data;
-
-      if (data?.old_password?.length) {
-        toast.error(data.old_password[0]);
-      } else if (data?.detail) {
-        toast.error(data.detail);
-      } else if (data?.error) {
-        toast.error(data.error);
-      } else {
-        toast.error("Password update failed");
-      }
+    } catch {
+      // handled globally by axios interceptor
     }
   };
 
-  // DELETE ACCOUNT
-  const deleteProfile = async () => {
-    if (!window.confirm("This will permanently delete your account. Continue?")) return;
-
+  // DELETE ACCOUNT (PRO FLOW)
+  const confirmDelete = async () => {
     try {
+      setDeleting(true);
       await api.delete("auth/me/");
+      toast.success("Account deleted successfully");
       localStorage.clear();
       window.location.href = "/login";
     } catch {
       toast.error("Failed to delete account");
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -215,11 +212,45 @@ export default function VendorProfile() {
 
           <h3 className="section-title danger">Danger Zone</h3>
 
-          <button className="btn-danger" onClick={deleteProfile}>
+          <button
+            className="btn-danger"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
             Delete Account
           </button>
         </div>
       </div>
+
+      {/* 🔥 DELETE CONFIRM MODAL */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-card danger">
+            <h3>Delete Account</h3>
+            <p>
+              This action is <strong>permanent</strong>.  
+              All your data will be deleted.
+            </p>
+
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="btn-danger"
+                onClick={confirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

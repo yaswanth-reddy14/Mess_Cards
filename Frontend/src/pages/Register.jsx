@@ -7,9 +7,6 @@ import { toast } from "react-toastify";
 export default function Register() {
   const navigate = useNavigate();
 
-  // STEP CONTROL (OTP TEMP DISABLED)
-  // const [step, setStep] = useState(1); // 1=form, 2=otp
-
   // FORM FIELDS
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -17,15 +14,9 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("STUDENT");
 
-  // OTP (TEMP DISABLED)
-  // const [otp, setOtp] = useState("");
-
   // UI STATE
   const [loading, setLoading] = useState(false);
 
-  /* =========================
-     DIRECT REGISTER (OTP DISABLED)
-  ========================= */
   const registerDirectly = async (e) => {
     e.preventDefault();
 
@@ -62,16 +53,8 @@ export default function Register() {
 
       toast.success("Registration successful");
       navigate("/login");
-    } catch (err) {
-      const data = err.response?.data;
-
-      toast.error(
-        data?.error ||
-        data?.email?.[0] ||
-        data?.confirm_password ||
-        data?.password?.[0] ||
-        "Registration failed"
-      );
+    } catch {
+      // error handled globally by axios interceptor
     } finally {
       setLoading(false);
     }
@@ -80,6 +63,16 @@ export default function Register() {
   return (
     <div className="auth-container">
       <form className="auth-card" onSubmit={registerDirectly}>
+
+        {/* 🔙 BACK BUTTON */}
+        <button
+          type="button"
+          className="back-btn"
+          onClick={() => navigate("/login")}
+        >
+          ← Back to Login
+        </button>
+
         <h2>Create Account</h2>
 
         <input

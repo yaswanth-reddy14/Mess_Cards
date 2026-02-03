@@ -14,6 +14,10 @@ export default function StudentProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // 🔥 Delete account modal state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   // LOAD PROFILE
   useEffect(() => {
     api.get("auth/me/")
@@ -26,34 +30,24 @@ export default function StudentProfile() {
 
   // UPDATE PHONE
   const updatePhone = async () => {
-  if (!phone.trim()) {
-    toast.error("Phone number cannot be empty");
-    return;
-  }
+    if (!/^\d{10}$/.test(phone)) {
+      toast.error("Phone number must be exactly 10 digits");
+      return;
+    }
 
-  if (!/^\d{10}$/.test(phone)) {
-    toast.error("Phone number must be exactly 10 digits");
-    return;
-  }
+    try {
+      setSaving(true);
+      const res = await api.patch("auth/me/", { phone });
+      setUser(res.data);
+      toast.success("Phone updated successfully");
+    } catch {
+      // handled globally
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  try {
-    setSaving(true);
-    const res = await api.patch("auth/me/", { phone });
-    setUser(res.data);
-    toast.success("Phone updated successfully");
-  } catch (err) {
-    const msg =
-      err.response?.data?.phone?.[0] ||
-      err.response?.data?.detail ||
-      "Failed to update phone";
-    alert(msg);
-  } finally {
-    setSaving(false);
-  }
-};
-
-
-  // CHANGE PASSWORD (FULL FIX)
+  // CHANGE PASSWORD
   const changePassword = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       toast.error("All password fields are required");
@@ -76,22 +70,28 @@ export default function StudentProfile() {
         new_password: newPassword,
       });
 
-      toast.success("Password changed successfully");
+      toast.success("Password updated successfully");
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err) {
-      const data = err.response?.data;
+    } catch {
+      // handled globally
+    }
+  };
 
-      if (data?.old_password?.length) {
-        toast.error(data.old_password[0]); // 👈 exact backend message
-      } else if (data?.detail) {
-        toast.error(data.detail);
-      } else if (data?.error) {
-        toast.error(data.error);
-      } else {
-        toast.error("Password change failed");
-      }
+  // DELETE ACCOUNT (PRO FLOW)
+  const confirmDelete = async () => {
+    try {
+      setDeleting(true);
+      await api.delete("auth/me/");
+      toast.success("Account deleted successfully");
+      localStorage.clear();
+      window.location.href = "/login";
+    } catch {
+      toast.error("Failed to delete account");
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -100,10 +100,9 @@ export default function StudentProfile() {
   return (
     <>
       <StudentHeader />
+      <BackButton />
 
       <div className="profile-container">
-        <BackButton />
-
         {/* LEFT CARD */}
         <div className="profile-card">
           <div className="avatar">
@@ -128,14 +127,17 @@ export default function StudentProfile() {
 
         {/* RIGHT CONTENT */}
         <div className="profile-info">
-          <h3 className="section-title">Contact Info</h3>
+          <h3 className="section-title">Contact Information</h3>
 
           <div className="info-row input-row">
-            <label>Phone</label>
+            <label>Phone Number</label>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter phone number"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 10) setPhone(value);
+              }}
+              placeholder="Enter 10-digit phone number"
             />
           </div>
 
@@ -149,7 +151,7 @@ export default function StudentProfile() {
 
           <div className="divider" />
 
-          <h3 className="section-title">Change Password</h3>
+          <h3 className="section-title">Security</h3>
 
           <div className="info-row input-row">
             <label>Old Password</label>
@@ -179,10 +181,52 @@ export default function StudentProfile() {
           </div>
 
           <button className="btn-primary" onClick={changePassword}>
-            Update Password
+            Change Password
+          </button>
+
+          <div className="divider" />
+
+          <h3 className="section-title danger">Danger Zone</h3>
+
+          <button
+            className="btn-danger"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            Delete Account
           </button>
         </div>
       </div>
+
+      {/* 🔥 DELETE CONFIRM MODAL */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-card danger">
+            <h3>Delete Account</h3>
+            <p>
+              This action is <strong>permanent</strong>.  
+              Your account and data will be deleted.
+            </p>
+
+            <div className="modal-actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="btn-danger"
+                onClick={confirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
