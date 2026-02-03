@@ -67,11 +67,15 @@ MIDDLEWARE = [
 # CORS / CSRF
 
 
+# CORS / CSRF
+
+
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://mess-cards-xyrg.vercel.app",
+    "https://mess-cards-xyrg-om08zz4zg-yaswanth-reddy14s-projects.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -79,6 +83,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://mess-cards-xyrg.vercel.app",
+    "https://mess-cards-xyrg-om08zz4zg-yaswanth-reddy14s-projects.vercel.app",
 ]
 
 CORS_ALLOW_HEADERS = [
