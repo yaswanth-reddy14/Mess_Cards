@@ -8,11 +8,12 @@ from .views import (
 )
 
 urlpatterns = [
-    path("register/", RegisterView.as_view()),
+    # AUTH / PROFILE
+    path("register/", RegisterView.as_view()),   # optional / admin use
     path("me/", MeView.as_view()),
     path("change-password/", ChangePasswordView.as_view()),
 
-    # EMAIL OTP FLOW
+    # EMAIL OTP FLOW (PUBLIC)
     path("send-otp/", SendEmailOTPView.as_view()),
     path("verify-otp-register/", VerifyEmailOTPRegisterView.as_view()),
 ]

@@ -66,3 +66,5 @@ htmlcov/
 .cache/
 .tmp/
 .temp/
+
+.staticfiles

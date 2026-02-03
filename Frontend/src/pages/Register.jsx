@@ -8,7 +8,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   // STEP CONTROL
-  const [step, setStep] = useState(1); // 1 = form, 2 = otp
+  const [step, setStep] = useState(1); // 1=form, 2=otp
 
   // FORM FIELDS
   const [name, setName] = useState("");
@@ -52,8 +52,8 @@ export default function Register() {
     try {
       setLoading(true);
 
-      await api.post("/auth/send-otp/", {
-        email: email.trim(),
+      await api.post("auth/send-otp/", {
+        email: email.trim().toLowerCase(),
       });
 
       toast.success("OTP sent to your email");
@@ -79,9 +79,9 @@ export default function Register() {
     try {
       setLoading(true);
 
-      await api.post("/auth/verify-otp-register/", {
-        name,
-        email: email.trim(),
+      await api.post("auth/verify-otp-register/", {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
         password,
         confirm_password: confirmPassword,
         role,
@@ -98,8 +98,11 @@ export default function Register() {
         data?.email?.[0] ||
         data?.confirm_password ||
         data?.password?.[0] ||
-        "Registration failed"
+        "Invalid or expired OTP"
       );
+
+      // IMPORTANT UX FIX
+      setOtp("");
     } finally {
       setLoading(false);
     }
@@ -113,7 +116,7 @@ export default function Register() {
       >
         <h2>{step === 1 ? "Create Account" : "Verify Email OTP"}</h2>
 
-        {/* STEP 1 — REGISTER FORM */}
+        {/* STEP 1 */}
         {step === 1 && (
           <>
             <input
@@ -158,7 +161,7 @@ export default function Register() {
           </>
         )}
 
-        {/* STEP 2 — OTP VERIFY */}
+        {/* STEP 2 */}
         {step === 2 && (
           <>
             <input
@@ -179,7 +182,7 @@ export default function Register() {
               style={{ cursor: "pointer" }}
               onClick={() => setStep(1)}
             >
-              ← Edit details
+              ← Edit details / Resend OTP
             </p>
           </>
         )}

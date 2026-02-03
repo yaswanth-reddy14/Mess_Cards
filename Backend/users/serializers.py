@@ -12,6 +12,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "email", "password", "confirm_password", "role")
 
     def validate_email(self, value):
+        """
+        Prevent duplicate users.
+        OTP table may have the email — that is fine.
+        Only block if USER already exists.
+        """
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email already exists")
         return value
@@ -24,7 +29,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop("confirm_password")
+        # Remove fields not part of User model
+        validated_data.pop("confirm_password", None)
+        validated_data.pop("otp", None)  # IMPORTANT for OTP flow safety
 
         user = User.objects.create_user(
             email=validated_data["email"],
@@ -50,9 +57,13 @@ class UserSerializer(serializers.ModelSerializer):
             return value
 
         if not value.isdigit():
-            raise serializers.ValidationError("Phone number must contain only digits")
+            raise serializers.ValidationError(
+                "Phone number must contain only digits"
+            )
 
         if len(value) != 10:
-            raise serializers.ValidationError("Phone number must be exactly 10 digits")
+            raise serializers.ValidationError(
+                "Phone number must be exactly 10 digits"
+            )
 
         return value

@@ -1,8 +1,8 @@
 from pathlib import Path
 import os
-import dj_database_url
 from dotenv import load_dotenv
 from datetime import timedelta
+import dj_database_url
 
 
 # BASE DIR & ENV
@@ -11,19 +11,19 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
+
 # SECURITY
 
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key")
 
-DEBUG = os.getenv("DEBUG","False") == "True"
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     ".onrender.com",
 ]
-
 
 
 # APPLICATIONS
@@ -63,6 +63,10 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
+
+# CORS / CSRF
+
+
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
@@ -72,24 +76,10 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
-
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://mess-cards-xyrg.vercel.app",
 ]
-
-
 
 
 # URLS / TEMPLATES
@@ -116,35 +106,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# DATABASE (POSTGRESQL)
+# DATABASE (Render / Local)
 
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=True,
     )
 }
 
 
-
-# CUSTOM USER MODEL
+# AUTH
 
 
 AUTH_USER_MODEL = "users.User"
 
-
-# PASSWORD VALIDATION
-
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
 ]
 
 
@@ -164,7 +145,6 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
@@ -175,30 +155,19 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.AllowAny",
-    ),
 }
 
 SIMPLE_JWT = {
-    # Long access token (example: 30 days)
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
-
-    # Refresh token longer than access token
     "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
-
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 
-
 # EMAIL (GMAIL OTP)
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

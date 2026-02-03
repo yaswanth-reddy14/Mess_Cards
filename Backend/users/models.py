@@ -1,6 +1,9 @@
 import uuid
 import random
+from datetime import timedelta
+
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
@@ -21,8 +24,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
-    #  STRICT 10-digit phone (required for OTP)
-    phone = models.CharField(max_length=10, blank=True , null=True)
+    # OPTIONAL — NOT USED FOR OTP ANYMORE
+    phone = models.CharField(max_length=10, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
 
     groups = models.ManyToManyField(Group, blank=True)
@@ -40,15 +43,26 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-#  OTP MODEL 
+
+# EMAIL OTP MODEL
+
 class EmailOTP(models.Model):
     email = models.EmailField(unique=True)
     otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def is_expired(self):
+        """
+        OTP valid for 5 minutes
+        """
+        return timezone.now() > self.created_at + timedelta(minutes=5)
+
     def __str__(self):
         return f"{self.email} - {self.otp}"
 
-# OTP GENERATOR (USED IN SERIALIZER / VIEW)
+
+
+# OTP GENERATOR
+
 def generate_otp():
     return str(random.randint(100000, 999999))
