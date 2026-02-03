@@ -7,9 +7,8 @@ const api = axios.create({
     : import.meta.env.VITE_API_URL + "/",
 });
 
-// =======================
 // REQUEST INTERCEPTOR
-// =======================
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access");
@@ -39,9 +38,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// =======================
+
 // RESPONSE INTERCEPTOR
-// =======================
+
 api.interceptors.response.use(
   (response) => {
     clearTimeout(response.config._toastTimer);
