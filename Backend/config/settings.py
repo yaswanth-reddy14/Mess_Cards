@@ -70,6 +70,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://mess-cards-xyrg.vercel.app",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://mess-cards-xyrg.vercel.app",
