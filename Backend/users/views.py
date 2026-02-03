@@ -1,15 +1,13 @@
 import random
 from datetime import timedelta
-from threading import Thread
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -21,7 +19,9 @@ from .serializers import (
 )
 
 
+# ======================
 # AUTH: CURRENT USER
+# ======================
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -44,14 +44,18 @@ class MeView(APIView):
         return Response({"message": "Account deleted successfully"})
 
 
+# ======================
 # EMAIL LOGIN (JWT)
+# ======================
 
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
     permission_classes = [AllowAny]
 
 
-# DIRECT REGISTER (ADMIN / OPTIONAL)
+# ======================
+# DIRECT REGISTER (ADMIN)
+# ======================
 
 class RegisterView(CreateAPIView):
     queryset = User.objects.all()
@@ -59,7 +63,9 @@ class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
 
 
+# ======================
 # CHANGE PASSWORD
+# ======================
 
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -83,21 +89,9 @@ class ChangePasswordView(APIView):
         return Response({"message": "Password updated successfully"})
 
 
-
+# ======================
 # SEND EMAIL OTP (FIXED)
-
-
-def send_otp_email(email, otp):
-    send_mail(
-        subject="Your OTP for Registration",
-        message=f"Your OTP is {otp}. It is valid for 5 minutes.",
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
-    )
-
-
-# SEND EMAIL OTP
+# ======================
 
 class SendEmailOTPView(APIView):
     permission_classes = [AllowAny]
@@ -119,14 +113,16 @@ class SendEmailOTPView(APIView):
         )
 
         try:
-            send_mail(
+            msg = EmailMessage(
                 subject="Your OTP for Registration",
-                message=f"Your OTP is {otp}. It is valid for 5 minutes.",
+                body=f"Your OTP is {otp}. It is valid for 5 minutes.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                fail_silently=False,
-                timeout=10,   # 🔥 IMPORTANT
+                to=[email],
             )
+
+            # ⛔ prevents Gunicorn worker hang
+            msg.send(fail_silently=False)
+
         except Exception as e:
             print("EMAIL ERROR:", e)
             return Response(
@@ -137,9 +133,9 @@ class SendEmailOTPView(APIView):
         return Response({"message": "OTP sent successfully"}, status=200)
 
 
-
-# VERIFY EMAIL OTP + REGISTER
-
+# ======================
+# VERIFY OTP + REGISTER
+# ======================
 
 class VerifyEmailOTPRegisterView(APIView):
     permission_classes = [AllowAny]
@@ -156,7 +152,7 @@ class VerifyEmailOTPRegisterView(APIView):
         except EmailOTP.DoesNotExist:
             return Response({"error": "OTP not found. Request again."}, status=400)
 
-        # OTP expiry (5 min)
+        # ⏱ OTP expiry (5 minutes)
         if timezone.now() > record.created_at + timedelta(minutes=5):
             record.delete()
             return Response({"error": "OTP expired. Request again."}, status=400)
