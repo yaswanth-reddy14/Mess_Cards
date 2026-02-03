@@ -93,6 +93,9 @@ class ChangePasswordView(APIView):
 
 # SEND EMAIL OTP
 
+from django.core.mail import send_mail
+from django.conf import settings
+
 class SendEmailOTPView(APIView):
     permission_classes = [AllowAny]
 
@@ -100,10 +103,7 @@ class SendEmailOTPView(APIView):
         email = request.data.get("email")
 
         if not email:
-            return Response(
-                {"error": "Email is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Email is required"}, status=400)
 
         otp = str(random.randint(100000, 999999))
 
@@ -112,14 +112,22 @@ class SendEmailOTPView(APIView):
             defaults={"otp": otp}
         )
 
-        send_mail(
-            subject="Your OTP for Registration",
-            message=f"Your OTP is {otp}. Do not share it.",
-            from_email=None,  # uses DEFAULT_FROM_EMAIL
-            recipient_list=[email],
-        )
+        try:
+            send_mail(
+                subject="Your OTP for Registration",
+                message=f"Your OTP is {otp}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            return Response(
+                {"error": "Email service not configured"},
+                status=500
+            )
 
-        return Response({"message": "OTP sent to email"})
+        return Response({"message": "OTP sent"})
+
 
 
 
@@ -146,19 +154,19 @@ class VerifyEmailOTPRegisterView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # 🔑 IMPORTANT: validate OTP FIRST
+        #  IMPORTANT: validate OTP FIRST
         if record.otp != otp:
             return Response(
                 {"error": "Invalid OTP"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ✅ OTP is correct → now register user
+        #  OTP is correct → now register user
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # 🔥 OTP must be single-use
+        # OTP must be single-use
         record.delete()
 
         return Response(
