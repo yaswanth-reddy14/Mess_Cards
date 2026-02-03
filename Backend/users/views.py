@@ -1,5 +1,6 @@
 import random
 from datetime import timedelta
+from threading import Thread
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -19,9 +20,8 @@ from .serializers import (
     UserSerializer,
 )
 
-# =========================
+
 # AUTH: CURRENT USER
-# =========================
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -44,18 +44,14 @@ class MeView(APIView):
         return Response({"message": "Account deleted successfully"})
 
 
-# =========================
 # EMAIL LOGIN (JWT)
-# =========================
 
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
     permission_classes = [AllowAny]
 
 
-# =========================
 # DIRECT REGISTER (ADMIN / OPTIONAL)
-# =========================
 
 class RegisterView(CreateAPIView):
     queryset = User.objects.all()
@@ -63,9 +59,7 @@ class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
 
 
-# =========================
 # CHANGE PASSWORD
-# =========================
 
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -89,9 +83,19 @@ class ChangePasswordView(APIView):
         return Response({"message": "Password updated successfully"})
 
 
-# =========================
-# SEND EMAIL OTP
-# =========================
+
+# SEND EMAIL OTP (FIXED)
+
+
+def send_otp_email(email, otp):
+    send_mail(
+        subject="Your OTP for Registration",
+        message=f"Your OTP is {otp}. It is valid for 5 minutes.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
 
 class SendEmailOTPView(APIView):
     permission_classes = [AllowAny]
@@ -112,28 +116,15 @@ class SendEmailOTPView(APIView):
             }
         )
 
-        try:
-            send_mail(
-                subject="Your OTP for Registration",
-                message=f"Your OTP is {otp}. It is valid for 5 minutes.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                fail_silently=False,
-            )
-        except Exception as e:
-            # IMPORTANT: log real error on Render
-            print("EMAIL ERROR:", e)
-            return Response(
-                {"error": "Failed to send OTP email"},
-                status=500
-            )
+        #  NON-BLOCKING EMAIL SEND (CRITICAL FIX)
+        Thread(target=send_otp_email, args=(email, otp)).start()
 
         return Response({"message": "OTP sent successfully"})
 
 
-# =========================
+
 # VERIFY EMAIL OTP + REGISTER
-# =========================
+
 
 class VerifyEmailOTPRegisterView(APIView):
     permission_classes = [AllowAny]
@@ -150,7 +141,7 @@ class VerifyEmailOTPRegisterView(APIView):
         except EmailOTP.DoesNotExist:
             return Response({"error": "OTP not found. Request again."}, status=400)
 
-        # ⏱ OTP expiry check (5 minutes)
+        # OTP expiry (5 min)
         if timezone.now() > record.created_at + timedelta(minutes=5):
             record.delete()
             return Response({"error": "OTP expired. Request again."}, status=400)
@@ -162,7 +153,6 @@ class VerifyEmailOTPRegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # single-use OTP
-        record.delete()
+        record.delete()  # single-use OTP
 
         return Response({"message": "Registration successful"}, status=201)
