@@ -92,7 +92,7 @@ class ChangePasswordView(APIView):
 
 # SEND EMAIL OTP (STABLE FIX)
 
-
+"""
 class SendEmailOTPView(APIView):
     permission_classes = [AllowAny]
 
@@ -168,3 +168,4 @@ class VerifyEmailOTPRegisterView(APIView):
         record.delete()
 
         return Response({"message": "Registration successful"}, status=201)
+"""

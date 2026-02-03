@@ -18,16 +18,21 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Skip loading toast for OTP calls (fast + annoying)
-    const skipToast =
-      config.url?.includes("send-otp") ||
-      config.url?.includes("verify-otp");
+    // OTP temporarily disabled
+    // const skipToast =
+    //   config.url?.includes("send-otp") ||
+    //   config.url?.includes("verify-otp");
 
-    if (!skipToast) {
-      config._toastTimer = setTimeout(() => {
-        config._loadingToast = toast.loading("Loading...");
-      }, 400);
-    }
+    // if (!skipToast) {
+    //   config._toastTimer = setTimeout(() => {
+    //     config._loadingToast = toast.loading("Loading...");
+    //   }, 400);
+    // }
+
+    // Always show loading toast now
+    config._toastTimer = setTimeout(() => {
+      config._loadingToast = toast.loading("Loading...");
+    }, 400);
 
     return config;
   },
