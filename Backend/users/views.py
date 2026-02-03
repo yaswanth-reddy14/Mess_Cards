@@ -97,6 +97,8 @@ def send_otp_email(email, otp):
     )
 
 
+# SEND EMAIL OTP
+
 class SendEmailOTPView(APIView):
     permission_classes = [AllowAny]
 
@@ -116,10 +118,23 @@ class SendEmailOTPView(APIView):
             }
         )
 
-        #  NON-BLOCKING EMAIL SEND (CRITICAL FIX)
-        Thread(target=send_otp_email, args=(email, otp)).start()
+        try:
+            send_mail(
+                subject="Your OTP for Registration",
+                message=f"Your OTP is {otp}. It is valid for 5 minutes.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+                timeout=10,   # 🔥 IMPORTANT
+            )
+        except Exception as e:
+            print("EMAIL ERROR:", e)
+            return Response(
+                {"error": "Email service unavailable. Try again later."},
+                status=503
+            )
 
-        return Response({"message": "OTP sent successfully"})
+        return Response({"message": "OTP sent successfully"}, status=200)
 
 
 
