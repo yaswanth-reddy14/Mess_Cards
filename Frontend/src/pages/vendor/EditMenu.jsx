@@ -8,7 +8,7 @@ export default function EditMenu() {
   const { messId, menuId } = useParams();
   const navigate = useNavigate();
 
-  const [day, setDay] = useState("MONDAY"); // 🔥 UI READY
+  const [day, setDay] = useState("MONDAY");
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [mealType, setMealType] = useState("");
@@ -24,10 +24,10 @@ export default function EditMenu() {
           return;
         }
 
+        setDay(menu.day);
         setName(menu.name);
         setPrice(menu.price);
         setMealType(menu.meal_type);
-        setDay(menu.day || "MONDAY"); // ✅ safe fallback
       })
       .catch(() => alert("Failed to load menu"));
   }, [messId, menuId, navigate]);
@@ -36,10 +36,10 @@ export default function EditMenu() {
     e.preventDefault();
 
     await api.put(`messes/${messId}/menus/${menuId}/`, {
+      day,                 // ✅ FIX
       name,
       price,
       meal_type: mealType,
-      // day, ❌ backend not ready yet
     });
 
     navigate(-1);
@@ -55,12 +55,8 @@ export default function EditMenu() {
           <h2>Edit Menu Item</h2>
 
           <form onSubmit={submit} className="grid-form">
-            {/* DAY (UI ONLY) */}
-            <select
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
-              required
-            >
+            {/* DAY */}
+            <select value={day} onChange={(e) => setDay(e.target.value)} required>
               <option value="MONDAY">Monday</option>
               <option value="TUESDAY">Tuesday</option>
               <option value="WEDNESDAY">Wednesday</option>
@@ -70,7 +66,6 @@ export default function EditMenu() {
               <option value="SUNDAY">Sunday</option>
             </select>
 
-            {/* ITEM NAME */}
             <input
               placeholder="Item name"
               value={name}
@@ -78,7 +73,6 @@ export default function EditMenu() {
               required
             />
 
-            {/* PRICE */}
             <input
               type="number"
               step="0.01"
@@ -88,13 +82,11 @@ export default function EditMenu() {
               required
             />
 
-            {/* MEAL TYPE */}
             <select
               value={mealType}
               onChange={(e) => setMealType(e.target.value)}
               required
             >
-              <option value="">Select Meal</option>
               <option value="BREAKFAST">Breakfast</option>
               <option value="LUNCH">Lunch</option>
               <option value="DINNER">Dinner</option>

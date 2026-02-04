@@ -8,7 +8,7 @@ export default function AddMenu() {
   const { messId } = useParams();
   const navigate = useNavigate();
 
-  const [day, setDay] = useState("MONDAY"); // 🔥 UI READY (backend later)
+  const [day, setDay] = useState("MONDAY");
   const [mealType, setMealType] = useState("BREAKFAST");
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -20,10 +20,10 @@ export default function AddMenu() {
 
     try {
       await api.post(`messes/${messId}/menus/`, {
+        day,                 // ✅ FIX: SEND DAY
         meal_type: mealType,
         name,
         price,
-        // day, ❌ backend not ready yet (will add later)
       });
 
       navigate(`/vendor/${messId}/menus`);
@@ -44,7 +44,7 @@ export default function AddMenu() {
           {error && <div className="error">{error}</div>}
 
           <form onSubmit={submit} className="grid-form">
-            {/* DAY (UI READY) */}
+            {/* DAY */}
             <select
               value={day}
               onChange={(e) => setDay(e.target.value)}

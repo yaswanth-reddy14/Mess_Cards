@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import VendorHeader from "../../components/VendorHeader";
 import BackButton from "../../components/BackButton";
+import { toast } from "react-toastify";
+import ConfirmModal from "../../components/ConfirmModal";
 
 const DAYS = [
   { key: "MONDAY", label: "Mon" },
@@ -17,25 +19,46 @@ const DAYS = [
 export default function VendorMenus() {
   const { messId } = useParams();
   const navigate = useNavigate();
+
   const [menus, setMenus] = useState([]);
   const [selectedDay, setSelectedDay] = useState("MONDAY");
+
+  // 🔥 confirm modal state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedMenuId, setSelectedMenuId] = useState(null);
 
   useEffect(() => {
     api
       .get(`messes/${messId}/menus/`)
       .then((res) => setMenus(res.data))
-      .catch(() => alert("Failed to load menus"));
+      .catch(() => toast.error("Failed to load menus"));
   }, [messId]);
 
-  const deleteMenu = async (menuId) => {
-    if (!window.confirm("Delete this item?")) return;
+  /* =========================
+     DELETE FLOW (FIXED)
+  ========================= */
+
+  const requestDelete = (id) => {
+    setSelectedMenuId(id);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await api.delete(`messes/${messId}/menus/${menuId}/`);
-      setMenus((prev) => prev.filter((m) => m.id !== menuId));
+      await api.delete(`messes/${messId}/menus/${selectedMenuId}/`);
+      setMenus((prev) => prev.filter((m) => m.id !== selectedMenuId));
+      toast.success("Menu item deleted");
     } catch {
-      alert("Delete failed");
+      toast.error("Delete failed");
+    } finally {
+      setConfirmOpen(false);
+      setSelectedMenuId(null);
     }
   };
+
+  /* =========================
+     DAY FILTER
+  ========================= */
 
   const dayFilteredMenus = menus.filter(
     (m) => !m.day || m.day === selectedDay
@@ -108,7 +131,7 @@ export default function VendorMenus() {
 
                     <button
                       className="btn-delete"
-                      onClick={() => deleteMenu(item.id)}
+                      onClick={() => requestDelete(item.id)}
                     >
                       Delete
                     </button>
@@ -119,6 +142,17 @@ export default function VendorMenus() {
           ))}
         </div>
       </div>
+
+      {/* 🔥 CONFIRM POPUP */}
+      <ConfirmModal
+        open={confirmOpen}
+        title="Delete menu item?"
+        message="This action cannot be undone."
+        confirmText="Delete"
+        danger
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </>
   );
 }

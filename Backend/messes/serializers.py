@@ -1,19 +1,34 @@
 from rest_framework import serializers
-from .models import Mess, Menu, WeeklyMenu
-from users.models import User   
+from .models import Mess, Menu
+from users.models import User
 
+
+
+# MENU SERIALIZER (FIXED)
 
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
-        fields = ["id", "name", "price", "meal_type"]
+        fields = [
+            "id",
+            "day",          #  REQUIRED for day-wise filtering
+            "meal_type",
+            "name",
+            "price",
+        ]
 
+
+
+# OWNER SERIALIZER
 
 class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "name", "email", "phone"]
 
+
+
+# MESS SERIALIZER
 
 class MessSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True)
@@ -39,20 +54,3 @@ class MessSerializer(serializers.ModelSerializer):
             "is_open",
             "created_at",
         ]
-
-
-# ============================
-# WEEKLY MENU SERIALIZER (NEW)
-# ============================
-
-class WeeklyMenuSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WeeklyMenu
-        fields = [
-            "id",
-            "day",
-            "meal_type",
-            "items",
-            "price",
-        ]
-        read_only_fields = ["id"]
