@@ -12,6 +12,8 @@ export default function EditMess() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [location, setLocation] = useState("");
+  const [image, setImage] = useState(null);          //  NEW
+  const [currentImage, setCurrentImage] = useState(null); // NEW
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export default function EditMess() {
         setName(res.data.name);
         setAddress(res.data.address);
         setLocation(res.data.location);
+        setCurrentImage(res.data.image); //  existing image
         setLoading(false);
       })
       .catch(() => {
@@ -33,12 +36,18 @@ export default function EditMess() {
     e.preventDefault();
 
     try {
-      await api.patch(`/messes/${messId}/`, {
-        name,
-        address,
-        location,
-      });
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("address", address);
+      formData.append("location", location);
 
+      if (image) {
+        formData.append("image", image); // only if changed
+      }
+
+      await api.patch(`/messes/${messId}/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       toast.success("Mess details updated successfully");
       navigate("/vendor");
@@ -52,10 +61,35 @@ export default function EditMess() {
   return (
     <>
       <VendorHeader />
-      <BackButton/>
+      <BackButton />
 
       <form onSubmit={submit} style={form}>
         <h2 style={{ textAlign: "center" }}>Edit Mess</h2>
+
+        {/* IMAGE PREVIEW */}
+        {currentImage && (
+          <div style={{ textAlign: "center" }}>
+            <img
+              src={currentImage}
+              alt="Mess"
+              style={{
+                width: 110,
+                height: 110,
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #6366f1",
+                marginBottom: 12,
+              }}
+            />
+          </div>
+        )}
+
+        {/* IMAGE UPLOAD */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
 
         <input
           value={name}

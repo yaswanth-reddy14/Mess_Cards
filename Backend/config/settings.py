@@ -4,16 +4,12 @@ from dotenv import load_dotenv
 from datetime import timedelta
 import dj_database_url
 
-
 # BASE DIR & ENV
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-
 # SECURITY
-
 
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key")
 
@@ -25,9 +21,7 @@ ALLOWED_HOSTS = [
     ".onrender.com",
 ]
 
-
 # APPLICATIONS
-
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -48,9 +42,7 @@ INSTALLED_APPS = [
     "recommendations",
 ]
 
-
 # MIDDLEWARE
-
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -63,12 +55,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-
 # CORS / CSRF
-
-
-# CORS / CSRF
-
 
 CORS_ALLOW_ALL_ORIGINS = False
 
@@ -106,9 +93,7 @@ CORS_ALLOW_METHODS = [
     "OPTIONS",
 ]
 
-
 # URLS / TEMPLATES
-
 
 ROOT_URLCONF = "config.urls"
 
@@ -130,9 +115,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # DATABASE (Render / Local)
-
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -142,9 +125,7 @@ DATABASES = {
     )
 }
 
-
 # AUTH
-
 
 AUTH_USER_MODEL = "users.User"
 
@@ -153,28 +134,27 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
 ]
 
-
 # I18N
-
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # STATIC FILES
-
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# MEDIA FILES (User uploads - mess images)
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 # DRF + JWT
-
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -188,10 +168,9 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-
 # EMAIL (GMAIL OTP)
 
-
+"""
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -203,3 +182,4 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+"""

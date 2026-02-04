@@ -10,8 +10,6 @@ from .models import Mess, Menu
 from .serializers import MessSerializer, MenuSerializer
 from .permissions import IsOwner
 
-
-
 # MESS
 
 class MessViewSet(viewsets.ModelViewSet):
@@ -45,7 +43,6 @@ class MessViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated(), IsOwner()]
         return [permissions.IsAuthenticated()]
 
-
 # MENU (DAY + MEAL BASED)
 
 class MenuViewSet(viewsets.ModelViewSet):
@@ -69,8 +66,6 @@ class MenuViewSet(viewsets.ModelViewSet):
         if self.action in ["create", "update", "partial_update", "destroy"]:
             return [permissions.IsAuthenticated(), IsOwner()]
         return [permissions.IsAuthenticated()]
-
-
 
 # TOGGLE MESS OPEN / CLOSED
 

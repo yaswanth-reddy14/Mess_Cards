@@ -32,12 +32,9 @@ class OwnerSerializer(serializers.ModelSerializer):
 
 class MessSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer(read_only=True)
-    menu_items = MenuSerializer(
-        source="menus",
-        many=True,
-        read_only=True
-    )
-
+    menu_items = MenuSerializer( source="menus", many=True, read_only=True)
+    image = serializers.ImageField(required=False, allow_null=True)
+    
     class Meta:
         model = Mess
         fields = [
