@@ -2,6 +2,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+
 
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -16,17 +18,17 @@ class MessViewSet(viewsets.ModelViewSet):
     serializer_class = MessSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    #  REQUIRED FOR IMAGE UPLOAD
+    parser_classes = [MultiPartParser, FormParser]
+
     def get_queryset(self):
         user = self.request.user
         queryset = Mess.objects.all()
 
-        # OWNER sees only his messes
         if user.role == "OWNER":
             return queryset.filter(owner=user)
 
-        # STUDENT: optional location search
         location = self.request.query_params.get("location")
-
         if location:
             queryset = queryset.filter(
                 Q(location__icontains=location) |
@@ -36,6 +38,9 @@ class MessViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        #  DEBUG (TEMP – REMOVE LATER)
+        print("FILES:", self.request.FILES)
+
         serializer.save(owner=self.request.user)
 
     def get_permissions(self):

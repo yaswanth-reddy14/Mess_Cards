@@ -5,30 +5,48 @@ import VendorHeader from "../../components/VendorHeader";
 import BackButton from "../../components/BackButton";
 import { toast } from "react-toastify";
 
+// backend base (http://127.0.0.1:8000)
+const BACKEND_URL = import.meta.env.VITE_API_URL.replace("/api", "");
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe";
+
 export default function VendorMesses() {
   const [messes, setMesses] = useState([]);
   const [togglingId, setTogglingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/messes/")
-      .then(res => setMesses(res.data))
+    api
+      .get("/messes/")
+      .then((res) => setMesses(res.data))
       .catch(() => toast.error("Failed to load messes"));
   }, []);
+
+  const getImageUrl = (image) => {
+    if (!image) return FALLBACK_IMAGE;
+
+    // already absolute URL (local / render / prod)
+    if (image.startsWith("http")) return image;
+
+    // relative media path
+    if (image.startsWith("/media")) return `${BACKEND_URL}${image}`;
+
+    return FALLBACK_IMAGE;
+  };
 
   const deleteMess = async (id) => {
     if (!window.confirm("Delete this mess permanently?")) return;
 
     try {
       await api.delete(`/messes/${id}/`);
-      setMesses(prev => prev.filter(m => m.id !== id));
+      setMesses((prev) => prev.filter((m) => m.id !== id));
       toast.success("Mess deleted");
     } catch {
       toast.error("Failed to delete mess");
     }
   };
 
-  //  toggle open / closed
   const toggleStatus = async (id) => {
     if (togglingId === id) return;
 
@@ -36,17 +54,13 @@ export default function VendorMesses() {
       setTogglingId(id);
       const res = await api.patch(`/messes/${id}/toggle-status/`);
 
-      setMesses(prev =>
-        prev.map(m =>
-          m.id === id
-            ? { ...m, is_open: res.data.is_open }
-            : m
+      setMesses((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...m, is_open: res.data.is_open } : m
         )
       );
 
-      toast.success(
-        res.data.is_open ? "Mess is now Open" : "Mess is now Closed"
-      );
+      toast.success(res.data.is_open ? "Mess is now Open" : "Mess is now Closed");
     } catch {
       toast.error("Failed to update mess status");
     } finally {
@@ -66,30 +80,26 @@ export default function VendorMesses() {
         </button>
       </div>
 
-      {messes.length === 0 && (
-        <p style={{ opacity: 0.7 }}>No messes created yet.</p>
-      )}
-
       <div style={grid}>
-        {messes.map(mess => (
+        {messes.map((mess) => (
           <div key={mess.id} style={card}>
+            {/* IMAGE */}
             <div style={imageWrap}>
               <img
-                src={
-                  mess.image
-                    ? mess.image
-                    : "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe"
-                }
+                src={getImageUrl(mess.image)}
                 alt={mess.name}
                 style={image}
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_IMAGE;
+                }}
               />
             </div>
 
+            {/* CONTENT */}
             <div style={cardBody}>
               <h3 style={{ marginBottom: 6 }}>{mess.name}</h3>
               <p style={muted}>{mess.address}</p>
 
-              {/* STATUS TOGGLE */}
               <button
                 style={mess.is_open ? openBtn : closedBtn}
                 disabled={togglingId === mess.id}
@@ -162,69 +172,23 @@ const card = {
   boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
 };
 
-const imageWrap = { height: 160, overflow: "hidden" };
+const imageWrap = {
+  height: 160,
+  overflow: "hidden",
+};
 
-const image = { width: "100%", height: "100%", objectFit: "cover" };
+const image = {
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+};
 
 const cardBody = { padding: 16 };
-
 const muted = { fontSize: 13, opacity: 0.7, marginBottom: 12 };
+const actions = { display: "flex", gap: 10 };
 
-const actions = { display: "flex", gap: 10, marginTop: 10 };
-
-const viewBtn = {
-  flex: 1,
-  padding: "8px",
-  borderRadius: 8,
-  border: "none",
-  background: "#22c55e",
-  color: "#022c22",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const editBtn = {
-  flex: 1,
-  padding: "8px",
-  borderRadius: 8,
-  border: "none",
-  background: "#3b82f6",
-  color: "#fff",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const deleteBtn = {
-  flex: 1,
-  padding: "8px",
-  borderRadius: 8,
-  border: "none",
-  background: "#ef4444",
-  color: "#fff",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const openBtn = {
-  width: "100%",
-  marginBottom: 10,
-  padding: "6px",
-  borderRadius: 20,
-  border: "none",
-  background: "#22c55e",
-  color: "#022c22",
-  fontWeight: 700,
-  cursor: "pointer",
-};
-
-const closedBtn = {
-  width: "100%",
-  marginBottom: 10,
-  padding: "6px",
-  borderRadius: 20,
-  border: "none",
-  background: "#ef4444",
-  color: "#fff",
-  fontWeight: 700,
-  cursor: "pointer",
-};
+const viewBtn = { background: "#22c55e" };
+const editBtn = { background: "#3b82f6", color: "#fff" };
+const deleteBtn = { background: "#ef4444", color: "#fff" };
+const openBtn = { background: "#22c55e" };
+const closedBtn = { background: "#ef4444", color: "#fff" };

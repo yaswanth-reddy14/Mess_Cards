@@ -1,7 +1,6 @@
 import { useState } from "react";
 import api from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import "../../App.css";
 import VendorHeader from "../../components/VendorHeader";
 import BackButton from "../../components/BackButton";
 
@@ -14,21 +13,21 @@ export default function AddMess() {
   const [foodType, setFoodType] = useState("VEG");
   const [monthlyPrice, setMonthlyPrice] = useState("");
   const [mealsIncluded, setMealsIncluded] = useState("");
-  const [image, setImage] = useState(null); // NEW
+  const [image, setImage] = useState(null); // ✅ NEW
 
   const submit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
+    const formData = new FormData(); //  REQUIRED
     formData.append("name", name);
-    formData.append("location", location);
     formData.append("address", address);
+    formData.append("location", location);
     formData.append("food_type", foodType);
     formData.append("monthly_price", monthlyPrice);
     formData.append("meals_included", mealsIncluded);
 
     if (image) {
-      formData.append("image", image); //  OPTIONAL UPLOAD
+      formData.append("image", image); // IMAGE SENT
     }
 
     await api.post("messes/", formData, {
@@ -71,13 +70,6 @@ export default function AddMess() {
               required
             />
 
-            {/*IMAGE UPLOAD */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImage(e.target.files[0])}
-            />
-
             <input
               placeholder="Monthly Price"
               value={monthlyPrice}
@@ -100,6 +92,13 @@ export default function AddMess() {
               <option value="NON_VEG">Non-Veg</option>
               <option value="BOTH">Both</option>
             </select>
+
+            {/*  IMAGE UPLOAD */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
 
             <button className="primary-btn" type="submit">
               Add Mess

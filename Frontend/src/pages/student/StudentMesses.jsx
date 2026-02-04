@@ -13,10 +13,7 @@ export default function StudentMesses() {
     api
       .get("messes/")
       .then((res) => setMesses(res.data))
-      .catch(() => {
-        // silent fail – don’t break UI
-        setMesses([]);
-      });
+      .catch(() => setMesses([]));
   }, []);
 
   return (
@@ -36,9 +33,26 @@ export default function StudentMesses() {
           {messes.map((mess) => (
             <div
               key={mess.id}
-              className="card clickable"
+              className="card clickable student-mess-card"
               onClick={() => navigate(`/student/messes/${mess.id}`)}
             >
+              {/* IMAGE */}
+              <div className="mess-image-wrapper">
+                <img
+                  src={
+                    mess.image
+                      ? `${import.meta.env.VITE_API_URL.replace(
+                          "/api",
+                          ""
+                        )}${mess.image}`
+                      : "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe"
+                  }
+                  alt={mess.name}
+                  className="mess-image"
+                />
+              </div>
+
+              {/* CONTENT */}
               <div className="card-body">
                 <h3>{mess.name}</h3>
                 <p className="muted">{mess.address}</p>
