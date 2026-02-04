@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from users.models import User
-
+from cloudinary.models import CloudinaryField
 
 class Mess(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -16,7 +16,7 @@ class Mess(models.Model):
     address = models.TextField()
     location = models.CharField(max_length=255)
 
-    image = models.ImageField(upload_to="messes/", null=True, blank=True)
+    image = CloudinaryField("image", null=True, blank=True)
 
     FOOD_CHOICES = (
         ("VEG", "Veg"),

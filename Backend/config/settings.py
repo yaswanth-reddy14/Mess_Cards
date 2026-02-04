@@ -3,6 +3,10 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 import dj_database_url
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 
 # BASE DIR & ENV
 
@@ -40,6 +44,9 @@ INSTALLED_APPS = [
     "messes",
     "reviews",
     "recommendations",
+
+    "cloudinary",
+    "cloudinary_storage",
 ]
 
 # MIDDLEWARE
@@ -125,6 +132,15 @@ DATABASES = {
     )
 }
 
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+
 # AUTH
 
 AUTH_USER_MODEL = "users.User"
@@ -147,10 +163,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# MEDIA FILES (User uploads - mess images)
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

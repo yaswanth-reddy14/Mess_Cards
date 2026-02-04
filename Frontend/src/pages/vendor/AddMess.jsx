@@ -13,28 +13,24 @@ export default function AddMess() {
   const [foodType, setFoodType] = useState("VEG");
   const [monthlyPrice, setMonthlyPrice] = useState("");
   const [mealsIncluded, setMealsIncluded] = useState("");
-  const [image, setImage] = useState(null); // ✅ NEW
+  const [image, setImage] = useState(null);
 
   const submit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(); //  REQUIRED
+    const formData = new FormData();
     formData.append("name", name);
     formData.append("address", address);
     formData.append("location", location);
     formData.append("food_type", foodType);
-    formData.append("monthly_price", monthlyPrice);
+    formData.append("monthly_price", Number(monthlyPrice));
     formData.append("meals_included", mealsIncluded);
 
     if (image) {
-      formData.append("image", image); // IMAGE SENT
+      formData.append("image", image);
     }
 
-    await api.post("messes/", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    await api.post("messes/", formData); //  DO NOT set headers manually
 
     navigate("/vendor");
   };
@@ -71,6 +67,7 @@ export default function AddMess() {
             />
 
             <input
+              type="number"
               placeholder="Monthly Price"
               value={monthlyPrice}
               onChange={(e) => setMonthlyPrice(e.target.value)}
@@ -93,11 +90,11 @@ export default function AddMess() {
               <option value="BOTH">Both</option>
             </select>
 
-            {/*  IMAGE UPLOAD */}
+            {/* IMAGE UPLOAD */}
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setImage(e.target.files[0])}
+              onChange={(e) => setImage(e.target.files?.[0] || null)}
             />
 
             <button className="primary-btn" type="submit">

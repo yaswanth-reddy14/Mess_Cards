@@ -5,6 +5,9 @@ import VendorHeader from "../../components/VendorHeader";
 import BackButton from "../../components/BackButton";
 import { toast } from "react-toastify";
 
+// backend base url (http://127.0.0.1:8000 or render)
+const BACKEND_URL = import.meta.env.VITE_API_URL.replace("/api", "");
+
 export default function EditMess() {
   const { messId } = useParams();
   const navigate = useNavigate();
@@ -12,8 +15,8 @@ export default function EditMess() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [location, setLocation] = useState("");
-  const [image, setImage] = useState(null);          //  NEW
-  const [currentImage, setCurrentImage] = useState(null); // NEW
+  const [image, setImage] = useState(null);
+  const [currentImage, setCurrentImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +26,16 @@ export default function EditMess() {
         setName(res.data.name);
         setAddress(res.data.address);
         setLocation(res.data.location);
-        setCurrentImage(res.data.image); //  existing image
+
+        // 🔥 FIX: make image absolute URL
+        if (res.data.image) {
+          setCurrentImage(
+            res.data.image.startsWith("http")
+              ? res.data.image
+              : `${BACKEND_URL}${res.data.image}`
+          );
+        }
+
         setLoading(false);
       })
       .catch(() => {
@@ -42,21 +54,22 @@ export default function EditMess() {
       formData.append("location", location);
 
       if (image) {
-        formData.append("image", image); // only if changed
+        formData.append("image", image);
       }
 
-      await api.patch(`/messes/${messId}/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // ❌ DO NOT set headers manually
+      await api.patch(`/messes/${messId}/`, formData);
 
       toast.success("Mess details updated successfully");
       navigate("/vendor");
-    } catch (err) {
+    } catch {
       toast.error("Update failed");
     }
   };
 
-  if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
+  if (loading) {
+    return <p style={{ textAlign: "center" }}>Loading...</p>;
+  }
 
   return (
     <>
@@ -72,6 +85,9 @@ export default function EditMess() {
             <img
               src={currentImage}
               alt="Mess"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
               style={{
                 width: 110,
                 height: 110,
@@ -88,7 +104,7 @@ export default function EditMess() {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
+          onChange={(e) => setImage(e.target.files?.[0] || null)}
         />
 
         <input
