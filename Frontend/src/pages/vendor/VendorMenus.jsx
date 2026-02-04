@@ -23,7 +23,7 @@ export default function VendorMenus() {
   const [menus, setMenus] = useState([]);
   const [selectedDay, setSelectedDay] = useState("MONDAY");
 
-  // 🔥 confirm modal state
+  // confirm modal state
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null);
 
@@ -34,9 +34,9 @@ export default function VendorMenus() {
       .catch(() => toast.error("Failed to load menus"));
   }, [messId]);
 
-  /* =========================
+  /*
      DELETE FLOW (FIXED)
-  ========================= */
+   */
 
   const requestDelete = (id) => {
     setSelectedMenuId(id);
@@ -56,9 +56,9 @@ export default function VendorMenus() {
     }
   };
 
-  /* =========================
+  /*
      DAY FILTER
-  ========================= */
+  */
 
   const dayFilteredMenus = menus.filter(
     (m) => !m.day || m.day === selectedDay
@@ -143,7 +143,7 @@ export default function VendorMenus() {
         </div>
       </div>
 
-      {/* 🔥 CONFIRM POPUP */}
+      {/* CONFIRM POPUP */}
       <ConfirmModal
         open={confirmOpen}
         title="Delete menu item?"
@@ -157,7 +157,7 @@ export default function VendorMenus() {
   );
 }
 
-/* ================= STYLES ================= */
+/* STYLES */
 
 const page = {
   padding: "24px",

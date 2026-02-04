@@ -1184,3 +1184,49 @@ button:active::after {
   gap: 12px;
   justify-content: center;
 }
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-badge.open {
+  background: #22c55e;
+  color: #022c22;
+}
+
+.status-badge.closed {
+  background: #ef4444;
+  color: #fff;
+}
+
+.mess-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-selector {
+  display: flex;
+  gap: 10px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.day-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #cbd5f5;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.day-btn.active {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+}

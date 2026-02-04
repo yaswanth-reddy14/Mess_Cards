@@ -15,7 +15,7 @@ export default function VendorProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // 🔥 NEW: delete confirmation modal
+  //  NEW: delete confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -221,7 +221,7 @@ export default function VendorProfile() {
         </div>
       </div>
 
-      {/* 🔥 DELETE CONFIRM MODAL */}
+      {/* DELETE CONFIRM MODAL */}
       {showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="modal-card danger">
