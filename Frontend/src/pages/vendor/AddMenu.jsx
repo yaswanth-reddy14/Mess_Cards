@@ -20,7 +20,7 @@ export default function AddMenu() {
 
     try {
       await api.post(`messes/${messId}/menus/`, {
-        day,                 // ✅ FIX: SEND DAY
+        day,                 // FIX: SEND DAY
         meal_type: mealType,
         name,
         price,

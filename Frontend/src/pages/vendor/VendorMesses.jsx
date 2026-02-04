@@ -28,7 +28,7 @@ export default function VendorMesses() {
     }
   };
 
-  // 🔥 toggle open / closed
+  //  toggle open / closed
   const toggleStatus = async (id) => {
     if (togglingId === id) return;
 
