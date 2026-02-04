@@ -1,12 +1,23 @@
-from rest_framework import viewsets, permissions
-from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import viewsets, permissions, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Mess, Menu
-from .serializers import MessSerializer, MenuSerializer
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
+from .models import Mess, Menu, WeeklyMenu
+from .serializers import (
+    MessSerializer,
+    MenuSerializer,
+    WeeklyMenuSerializer,
+)
 from .permissions import IsOwner
 
 
+# =========================
+# MESS
+# =========================
 class MessViewSet(viewsets.ModelViewSet):
     serializer_class = MessSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -24,9 +35,8 @@ class MessViewSet(viewsets.ModelViewSet):
 
         if location:
             queryset = queryset.filter(
-                location__icontains=location
-            ) | queryset.filter(
-                address__icontains=location
+                Q(location__icontains=location) |
+                Q(address__icontains=location)
             )
 
         return queryset
@@ -40,6 +50,9 @@ class MessViewSet(viewsets.ModelViewSet):
         return [permissions.IsAuthenticated()]
 
 
+# =========================
+# MENU (single items)
+# =========================
 class MenuViewSet(viewsets.ModelViewSet):
     serializer_class = MenuSerializer
 
@@ -54,3 +67,56 @@ class MenuViewSet(viewsets.ModelViewSet):
         if self.action in ["create", "update", "partial_update", "destroy"]:
             return [permissions.IsAuthenticated(), IsOwner()]
         return [permissions.IsAuthenticated()]
+
+
+# =========================
+# WEEKLY MENU (NEW)
+# =========================
+class WeeklyMenuViewSet(viewsets.ModelViewSet):
+    serializer_class = WeeklyMenuSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return WeeklyMenu.objects.filter(
+            mess_id=self.kwargs["mess_id"]
+        )
+
+    def perform_create(self, serializer):
+        mess = get_object_or_404(
+            Mess,
+            id=self.kwargs["mess_id"],
+            owner=self.request.user
+        )
+        serializer.save(mess=mess)
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [IsAuthenticated(), IsOwner()]
+        return [IsAuthenticated()]
+
+
+# =========================
+# TOGGLE MESS OPEN / CLOSED
+# =========================
+class ToggleMessStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, mess_id):
+        try:
+            mess = Mess.objects.get(id=mess_id, owner=request.user)
+        except Mess.DoesNotExist:
+            return Response(
+                {"error": "Mess not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        mess.is_open = not mess.is_open
+        mess.save(update_fields=["is_open"])
+
+        return Response(
+            {
+                "message": "Mess status updated",
+                "is_open": mess.is_open,
+            },
+            status=status.HTTP_200_OK
+        )

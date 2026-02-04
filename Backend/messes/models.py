@@ -9,12 +9,12 @@ class Mess(models.Model):
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="owned_messes"   
+        related_name="owned_messes"
     )
 
     name = models.CharField(max_length=200)
     address = models.TextField()
-    location = models.CharField(max_length=255)  
+    location = models.CharField(max_length=255)
 
     image = models.ImageField(upload_to="messes/", null=True, blank=True)
 
@@ -29,6 +29,8 @@ class Mess(models.Model):
     meals_included = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    is_open = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -55,3 +57,49 @@ class Menu(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.meal_type})"
+
+
+# ============================
+# WEEKLY MENU (NEW FEATURE)
+# ============================
+
+class WeeklyMenu(models.Model):
+    DAYS = (
+        ("MON", "Monday"),
+        ("TUE", "Tuesday"),
+        ("WED", "Wednesday"),
+        ("THU", "Thursday"),
+        ("FRI", "Friday"),
+        ("SAT", "Saturday"),
+        ("SUN", "Sunday"),
+    )
+
+    MEAL_CHOICES = (
+        ("BREAKFAST", "Breakfast"),
+        ("LUNCH", "Lunch"),
+        ("DINNER", "Dinner"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    mess = models.ForeignKey(
+        Mess,
+        on_delete=models.CASCADE,
+        related_name="weekly_menus"
+    )
+
+    day = models.CharField(max_length=3, choices=DAYS)
+    meal_type = models.CharField(max_length=10, choices=MEAL_CHOICES)
+
+    items = models.TextField(
+        help_text="Comma separated items"
+    )
+
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        unique_together = ("mess", "day", "meal_type")
+        ordering = ["day", "meal_type"]
+
+    def __str__(self):
+        return f"{self.mess.name} - {self.day} - {self.meal_type}"

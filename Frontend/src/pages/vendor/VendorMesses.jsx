@@ -2,27 +2,62 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import VendorHeader from "../../components/VendorHeader";
-import BackButton from "../../components/BackButton"; //
+import BackButton from "../../components/BackButton";
+import { toast } from "react-toastify";
 
 export default function VendorMesses() {
   const [messes, setMesses] = useState([]);
+  const [togglingId, setTogglingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     api.get("/messes/")
       .then(res => setMesses(res.data))
-      .catch(() => alert("Failed to load messes"));
+      .catch(() => toast.error("Failed to load messes"));
   }, []);
 
   const deleteMess = async (id) => {
-    if (!window.confirm("Delete this mess?")) return;
-    await api.delete(`/messes/${id}/`);
-    setMesses(messes.filter(m => m.id !== id));
+    if (!window.confirm("Delete this mess permanently?")) return;
+
+    try {
+      await api.delete(`/messes/${id}/`);
+      setMesses(prev => prev.filter(m => m.id !== id));
+      toast.success("Mess deleted");
+    } catch {
+      toast.error("Failed to delete mess");
+    }
+  };
+
+  // 🔥 toggle open / closed
+  const toggleStatus = async (id) => {
+    if (togglingId === id) return;
+
+    try {
+      setTogglingId(id);
+      const res = await api.patch(`/messes/${id}/toggle-status/`);
+
+      setMesses(prev =>
+        prev.map(m =>
+          m.id === id
+            ? { ...m, is_open: res.data.is_open }
+            : m
+        )
+      );
+
+      toast.success(
+        res.data.is_open ? "Mess is now Open" : "Mess is now Closed"
+      );
+    } catch {
+      toast.error("Failed to update mess status");
+    } finally {
+      setTogglingId(null);
+    }
   };
 
   return (
     <div style={pageStyle}>
       <VendorHeader />
+      <BackButton />
 
       <div style={headerRow}>
         <h2>Your Messes</h2>
@@ -54,6 +89,15 @@ export default function VendorMesses() {
               <h3 style={{ marginBottom: 6 }}>{mess.name}</h3>
               <p style={muted}>{mess.address}</p>
 
+              {/* STATUS TOGGLE */}
+              <button
+                style={mess.is_open ? openBtn : closedBtn}
+                disabled={togglingId === mess.id}
+                onClick={() => toggleStatus(mess.id)}
+              >
+                {mess.is_open ? "Open" : "Closed"}
+              </button>
+
               <div style={actions}>
                 <button
                   style={viewBtn}
@@ -61,7 +105,9 @@ export default function VendorMesses() {
                 >
                   View Menus
                 </button>
+
                 <button
+                  style={editBtn}
                   onClick={() => navigate(`/vendor/${mess.id}/edit`)}
                 >
                   Edit
@@ -82,11 +128,9 @@ export default function VendorMesses() {
   );
 }
 
-/*  STYLES */
+/* STYLES */
 
-const pageStyle = {
-  padding: "20px",
-};
+const pageStyle = { padding: "20px" };
 
 const headerRow = {
   display: "flex",
@@ -116,34 +160,17 @@ const card = {
   borderRadius: 16,
   overflow: "hidden",
   boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-  transition: "transform .25s ease",
 };
 
-const imageWrap = {
-  height: 160,
-  overflow: "hidden",
-};
+const imageWrap = { height: 160, overflow: "hidden" };
 
-const image = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-};
+const image = { width: "100%", height: "100%", objectFit: "cover" };
 
-const cardBody = {
-  padding: 16,
-};
+const cardBody = { padding: 16 };
 
-const muted = {
-  fontSize: 13,
-  opacity: 0.7,
-  marginBottom: 12,
-};
+const muted = { fontSize: 13, opacity: 0.7, marginBottom: 12 };
 
-const actions = {
-  display: "flex",
-  gap: 10,
-};
+const actions = { display: "flex", gap: 10, marginTop: 10 };
 
 const viewBtn = {
   flex: 1,
@@ -152,6 +179,17 @@ const viewBtn = {
   border: "none",
   background: "#22c55e",
   color: "#022c22",
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+const editBtn = {
+  flex: 1,
+  padding: "8px",
+  borderRadius: 8,
+  border: "none",
+  background: "#3b82f6",
+  color: "#fff",
   fontWeight: 600,
   cursor: "pointer",
 };
@@ -167,14 +205,26 @@ const deleteBtn = {
   cursor: "pointer",
 };
 
-
-const editBtn = {
-  flex: 1,
-  padding: "8px",
-  borderRadius: 8,
+const openBtn = {
+  width: "100%",
+  marginBottom: 10,
+  padding: "6px",
+  borderRadius: 20,
   border: "none",
-  background: "#3b82f6",
+  background: "#22c55e",
+  color: "#022c22",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+const closedBtn = {
+  width: "100%",
+  marginBottom: 10,
+  padding: "6px",
+  borderRadius: 20,
+  border: "none",
+  background: "#ef4444",
   color: "#fff",
-  fontWeight: 600,
+  fontWeight: 700,
   cursor: "pointer",
 };

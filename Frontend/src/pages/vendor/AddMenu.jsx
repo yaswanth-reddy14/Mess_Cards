@@ -8,6 +8,7 @@ export default function AddMenu() {
   const { messId } = useParams();
   const navigate = useNavigate();
 
+  const [day, setDay] = useState("MONDAY"); // 🔥 UI READY (backend later)
   const [mealType, setMealType] = useState("BREAKFAST");
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -22,6 +23,7 @@ export default function AddMenu() {
         meal_type: mealType,
         name,
         price,
+        // day, ❌ backend not ready yet (will add later)
       });
 
       navigate(`/vendor/${messId}/menus`);
@@ -42,6 +44,21 @@ export default function AddMenu() {
           {error && <div className="error">{error}</div>}
 
           <form onSubmit={submit} className="grid-form">
+            {/* DAY (UI READY) */}
+            <select
+              value={day}
+              onChange={(e) => setDay(e.target.value)}
+              required
+            >
+              <option value="MONDAY">Monday</option>
+              <option value="TUESDAY">Tuesday</option>
+              <option value="WEDNESDAY">Wednesday</option>
+              <option value="THURSDAY">Thursday</option>
+              <option value="FRIDAY">Friday</option>
+              <option value="SATURDAY">Saturday</option>
+              <option value="SUNDAY">Sunday</option>
+            </select>
+
             {/* MEAL TYPE */}
             <select
               value={mealType}

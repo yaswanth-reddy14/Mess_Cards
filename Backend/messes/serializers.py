@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Mess, Menu
+from .models import Mess, Menu, WeeklyMenu
 from users.models import User   
 
 
@@ -12,7 +12,7 @@ class MenuSerializer(serializers.ModelSerializer):
 class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id","name", "email", "phone"]
+        fields = ["id", "name", "email", "phone"]
 
 
 class MessSerializer(serializers.ModelSerializer):
@@ -34,6 +34,25 @@ class MessSerializer(serializers.ModelSerializer):
             "monthly_price",
             "meals_included",
             "image",
-            "owner",        
-            "menu_items",   
+            "owner",
+            "menu_items",
+            "is_open",
+            "created_at",
         ]
+
+
+# ============================
+# WEEKLY MENU SERIALIZER (NEW)
+# ============================
+
+class WeeklyMenuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeeklyMenu
+        fields = [
+            "id",
+            "day",
+            "meal_type",
+            "items",
+            "price",
+        ]
+        read_only_fields = ["id"]
