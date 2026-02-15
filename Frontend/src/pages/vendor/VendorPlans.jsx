@@ -91,13 +91,13 @@ export default function VendorPlans() {
   return (
     <>
       <VendorHeader />
-      <div style={pageStyle}>
+      <div className="vendor-plans-page">
         <BackButton />
 
-        <div style={headerRow}>
+        <div className="vendor-plans-header">
           <div>
-            <h2 style={{ margin: 0 }}>{messName}</h2>
-            <p style={subText}>Create package options for students</p>
+            <h2 className="vendor-plans-title">{messName}</h2>
+            <p className="section-subtitle">Create package options for students</p>
           </div>
 
           <button
@@ -113,11 +113,11 @@ export default function VendorPlans() {
         ) : plans.length === 0 ? (
           <p className="empty-text">No plans added yet</p>
         ) : (
-          <div style={planGrid}>
+          <div className="vendor-plan-grid">
             {plans.map((plan) => (
-              <div key={plan.id} style={planCard}>
-                <div style={planHeader}>
-                  <h3 style={{ margin: 0 }}>{plan.name}</h3>
+              <div key={plan.id} className="vendor-plan-card">
+                <div className="vendor-plan-card-header">
+                  <h3 className="vendor-plan-name">{plan.name}</h3>
                   <span
                     className={`status-badge ${
                       plan.is_active ? "open" : "closed"
@@ -128,37 +128,37 @@ export default function VendorPlans() {
                 </div>
 
                 {plan.description ? (
-                  <p style={description}>{plan.description}</p>
+                  <p className="vendor-plan-desc">{plan.description}</p>
                 ) : (
-                  <p style={subText}>No description</p>
+                  <p className="section-subtitle">No description</p>
                 )}
 
-                <div style={metaGrid}>
-                  <div>
-                    <span style={metaLabel}>Price</span>
-                    <strong style={priceText}>Rs {plan.price}</strong>
+                <div className="vendor-plan-meta">
+                  <div className="vendor-plan-meta-row">
+                    <span className="vendor-plan-meta-label">Price</span>
+                    <strong className="vendor-plan-price">Rs {plan.price}</strong>
                   </div>
-                  <div>
-                    <span style={metaLabel}>Plan Items</span>
-                    <p style={metaText}>
+                  <div className="vendor-plan-meta-row">
+                    <span className="vendor-plan-meta-label">Plan Items</span>
+                    <p className="vendor-plan-meta-value">
                       {Array.isArray(plan.items) ? plan.items.length : 0} items
                     </p>
                   </div>
-                  <div>
-                    <span style={metaLabel}>Days</span>
-                    <p style={metaText}>
+                  <div className="vendor-plan-meta-row">
+                    <span className="vendor-plan-meta-label">Days</span>
+                    <p className="vendor-plan-meta-value">
                       {(plan.days || []).map(formatLabel).join(", ") || "-"}
                     </p>
                   </div>
-                  <div>
-                    <span style={metaLabel}>Meals</span>
-                    <p style={metaText}>
+                  <div className="vendor-plan-meta-row">
+                    <span className="vendor-plan-meta-label">Meals</span>
+                    <p className="vendor-plan-meta-value">
                       {(plan.meals || []).map(formatLabel).join(", ") || "-"}
                     </p>
                   </div>
                 </div>
 
-                <div style={actionRow}>
+                <div className="vendor-plan-actions">
                   <button
                     className="btn-edit"
                     onClick={() =>
@@ -198,81 +198,3 @@ export default function VendorPlans() {
     </>
   );
 }
-
-const pageStyle = {
-  padding: 24,
-  maxWidth: 1200,
-  margin: "0 auto",
-};
-
-const headerRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 12,
-  flexWrap: "wrap",
-  marginBottom: 20,
-};
-
-const subText = {
-  fontSize: 14,
-  opacity: 0.7,
-  marginTop: 6,
-};
-
-const planGrid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-  gap: 18,
-};
-
-const planCard = {
-  background: "rgba(15, 23, 42, 0.8)",
-  borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.08)",
-  padding: 18,
-  display: "flex",
-  flexDirection: "column",
-  gap: 14,
-};
-
-const planHeader = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 10,
-};
-
-const description = {
-  margin: 0,
-  color: "#cbd5e1",
-  lineHeight: 1.4,
-};
-
-const metaGrid = {
-  display: "grid",
-  gap: 10,
-};
-
-const metaLabel = {
-  display: "block",
-  opacity: 0.7,
-  fontSize: 12,
-  marginBottom: 2,
-};
-
-const metaText = {
-  margin: 0,
-  fontSize: 14,
-};
-
-const priceText = {
-  color: "#22c55e",
-  fontSize: 18,
-};
-
-const actionRow = {
-  display: "flex",
-  gap: 8,
-  flexWrap: "wrap",
-};

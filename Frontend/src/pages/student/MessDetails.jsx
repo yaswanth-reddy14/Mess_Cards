@@ -13,12 +13,21 @@ const DAYS = [
   { key: "SATURDAY", label: "Sat" },
   { key: "SUNDAY", label: "Sun" },
 ];
+const MEAL_ORDER = ["BREAKFAST", "LUNCH", "DINNER"];
 
 const prettyLabel = (value) =>
   String(value || "")
     .toLowerCase()
     .replace("_", " ")
     .replace(/^./, (char) => char.toUpperCase());
+
+const getPlanCellItems = (plan, day, mealType) => {
+  if (!Array.isArray(plan.items)) return [];
+  return plan.items
+    .filter((item) => item.day === day && item.meal_type === mealType)
+    .map((item) => item.name)
+    .filter(Boolean);
+};
 
 export default function MessDetails() {
   const { messId } = useParams();
@@ -108,28 +117,57 @@ export default function MessDetails() {
           <div className="plans-grid">
             {plans.map((plan) => (
               <div key={plan.id} className="plan-card">
-                <h4>{plan.name}</h4>
+                <h4 className="plan-name">{plan.name}</h4>
                 {plan.description && <p className="plan-desc">{plan.description}</p>}
 
                 <div className="plan-meta">
-                  <span>Days: {(plan.days || []).map(prettyLabel).join(", ")}</span>
-                  <span>Meals: {(plan.meals || []).map(prettyLabel).join(", ")}</span>
-                  <strong>Rs {plan.price}</strong>
+                  <div className="plan-meta-row">
+                    <span className="plan-meta-label">Days</span>
+                    <span className="plan-meta-value">
+                      {(plan.days || []).map(prettyLabel).join(", ")}
+                    </span>
+                  </div>
+                  <div className="plan-meta-row">
+                    <span className="plan-meta-label">Meals</span>
+                    <span className="plan-meta-value">
+                      {(plan.meals || []).map(prettyLabel).join(", ")}
+                    </span>
+                  </div>
+                  <div className="plan-meta-row">
+                    <span className="plan-meta-label">Price</span>
+                    <strong className="plan-price">Rs {plan.price}</strong>
+                  </div>
                 </div>
 
                 {Array.isArray(plan.items) && plan.items.length > 0 && (
-                  <div className="plan-items-list">
-                    {plan.items.map((item, index) => (
-                      <div
-                        key={`${plan.id}-${item.day}-${item.meal_type}-${item.name}-${index}`}
-                        className="plan-item-row"
-                      >
-                        <span>
-                          {prettyLabel(item.day)} | {prettyLabel(item.meal_type)}
-                        </span>
-                        <span>{item.name}</span>
-                      </div>
-                    ))}
+                  <div className="plan-schedule-wrap">
+                    <div className="plan-schedule-table">
+                      <div className="plan-schedule-head day-col">Day</div>
+                      {MEAL_ORDER.map((meal) => (
+                        <div key={`${plan.id}-head-${meal}`} className="plan-schedule-head">
+                          {prettyLabel(meal)}
+                        </div>
+                      ))}
+
+                      {DAYS.filter((day) => (plan.days || []).includes(day.key)).map((day) => (
+                        <div key={`${plan.id}-${day.key}-row`} className="plan-schedule-row">
+                          <div className="plan-schedule-day">
+                            {prettyLabel(day.key)}
+                          </div>
+                          {MEAL_ORDER.map((meal) => {
+                            const names = getPlanCellItems(plan, day.key, meal);
+                            return (
+                              <div
+                                key={`${plan.id}-${day.key}-${meal}`}
+                                className="plan-schedule-cell"
+                              >
+                                {names.length > 0 ? names.join(", ") : "—"}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

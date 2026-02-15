@@ -314,7 +314,7 @@ const planItemsHeader = {
 
 const planRow = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 2fr auto",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
   gap: 10,
 };
 
