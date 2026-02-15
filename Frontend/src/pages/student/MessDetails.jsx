@@ -34,6 +34,7 @@ export default function MessDetails() {
 
   const [mess, setMess] = useState(null);
   const [selectedDay, setSelectedDay] = useState("MONDAY");
+  const [selectedPlanIds, setSelectedPlanIds] = useState([]);
 
   useEffect(() => {
     api
@@ -47,8 +48,19 @@ export default function MessDetails() {
   const menuItems = mess.menu_items || [];
   const plans = mess.package_options || [];
   const meals = ["BREAKFAST", "LUNCH", "DINNER"];
+  const selectedPlans = plans.filter((plan) => selectedPlanIds.includes(plan.id));
 
   const dayMenus = menuItems.filter((item) => item.day === selectedDay);
+
+  const togglePlanCompare = (planId) => {
+    setSelectedPlanIds((prev) => {
+      if (prev.includes(planId)) {
+        return prev.filter((id) => id !== planId);
+      }
+      if (prev.length >= 3) return prev;
+      return [...prev, planId];
+    });
+  };
 
   return (
     <div className="mess-details-page">
@@ -110,6 +122,7 @@ export default function MessDetails() {
 
       <div className="details-card">
         <h3 className="section-title">Available Plans</h3>
+        <p className="compare-helper">Select up to 3 plans to compare side-by-side.</p>
 
         {plans.length === 0 ? (
           <p className="empty-text">No plans available</p>
@@ -117,7 +130,21 @@ export default function MessDetails() {
           <div className="plans-grid">
             {plans.map((plan) => (
               <div key={plan.id} className="plan-card">
-                <h4 className="plan-name">{plan.name}</h4>
+                <div className="plan-top-row">
+                  <h4 className="plan-name">{plan.name}</h4>
+                  <label className="compare-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={selectedPlanIds.includes(plan.id)}
+                      disabled={
+                        !selectedPlanIds.includes(plan.id) && selectedPlanIds.length >= 3
+                      }
+                      onChange={() => togglePlanCompare(plan.id)}
+                    />
+                    Compare
+                  </label>
+                </div>
+
                 {plan.description && <p className="plan-desc">{plan.description}</p>}
 
                 <div className="plan-meta">
@@ -151,9 +178,7 @@ export default function MessDetails() {
 
                       {DAYS.filter((day) => (plan.days || []).includes(day.key)).map((day) => (
                         <div key={`${plan.id}-${day.key}-row`} className="plan-schedule-row">
-                          <div className="plan-schedule-day">
-                            {prettyLabel(day.key)}
-                          </div>
+                          <div className="plan-schedule-day">{prettyLabel(day.key)}</div>
                           {MEAL_ORDER.map((meal) => {
                             const names = getPlanCellItems(plan, day.key, meal);
                             return (
@@ -161,7 +186,7 @@ export default function MessDetails() {
                                 key={`${plan.id}-${day.key}-${meal}`}
                                 className="plan-schedule-cell"
                               >
-                                {names.length > 0 ? names.join(", ") : "—"}
+                                {names.length > 0 ? names.join(", ") : "-"}
                               </div>
                             );
                           })}
@@ -175,6 +200,65 @@ export default function MessDetails() {
           </div>
         )}
       </div>
+
+      {selectedPlans.length >= 2 && (
+        <div className="details-card">
+          <div className="compare-header">
+            <h3 className="section-title">Compare Plans</h3>
+            <button
+              className="btn-delete"
+              onClick={() => setSelectedPlanIds([])}
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="compare-table-wrap">
+            <div
+              className="compare-table"
+              style={{
+                gridTemplateColumns: `170px repeat(${selectedPlans.length}, minmax(220px, 1fr))`,
+              }}
+            >
+              <div className="compare-label-head">Field</div>
+              {selectedPlans.map((plan) => (
+                <div key={`${plan.id}-head`} className="compare-plan-head">
+                  {plan.name}
+                </div>
+              ))}
+
+              <div className="compare-label">Price</div>
+              {selectedPlans.map((plan) => (
+                <div key={`${plan.id}-price`} className="compare-value compare-price">
+                  Rs {plan.price}
+                </div>
+              ))}
+
+              <div className="compare-label">Days</div>
+              {selectedPlans.map((plan) => (
+                <div key={`${plan.id}-days`} className="compare-value">
+                  {(plan.days || []).map(prettyLabel).join(", ") || "-"}
+                </div>
+              ))}
+
+              <div className="compare-label">Meals</div>
+              {selectedPlans.map((plan) => (
+                <div key={`${plan.id}-meals`} className="compare-value">
+                  {(plan.meals || []).map(prettyLabel).join(", ") || "-"}
+                </div>
+              ))}
+
+              <div className="compare-label">Menu Items</div>
+              {selectedPlans.map((plan) => (
+                <div key={`${plan.id}-items`} className="compare-value">
+                  {Array.isArray(plan.items) ? plan.items.length : 0}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="day-selector">
         {DAYS.map((day) => (

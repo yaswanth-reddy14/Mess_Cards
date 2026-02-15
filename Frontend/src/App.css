@@ -1053,6 +1053,32 @@ button:active::after {
   letter-spacing: 0.2px;
 }
 
+.compare-helper {
+  margin: -6px 0 14px;
+  opacity: 0.8;
+  font-size: 13px;
+}
+
+.plan-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.compare-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.compare-checkbox input {
+  accent-color: #6366f1;
+}
+
 .plan-items-list {
   margin-top: 4px;
   border-top: 1px dashed rgba(255, 255, 255, 0.15);
@@ -1227,6 +1253,60 @@ button:active::after {
 
 .vendor-plan-actions button {
   width: 100%;
+}
+
+.compare-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.compare-table-wrap {
+  overflow-x: auto;
+}
+
+.compare-table {
+  min-width: 680px;
+  display: grid;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.compare-label-head,
+.compare-plan-head {
+  background: rgba(99, 102, 241, 0.16);
+  color: #c7d2fe;
+  font-weight: 700;
+  padding: 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+
+.compare-label {
+  background: rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+  font-weight: 600;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+
+.compare-value {
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.compare-price {
+  color: #22c55e;
+  font-weight: 700;
 }
 
 /* Responsive */
@@ -1689,6 +1769,11 @@ button:active::after {
 
   .plan-schedule-table {
     grid-template-columns: 110px repeat(3, minmax(0, 1fr));
+  }
+
+  .compare-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
