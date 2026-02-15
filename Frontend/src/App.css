@@ -996,6 +996,51 @@ button:active::after {
   font-weight: 600;
 }
 
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.plan-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.plan-card h4 {
+  margin: 0 0 8px;
+}
+
+.plan-desc {
+  margin: 0 0 10px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.plan-meta {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.plan-items-list {
+  margin-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.plan-item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .menu-cards.three-col {
@@ -1274,7 +1319,7 @@ button:active::after {
 }
 
 
-/* ===== STUDENT DASHBOARD CARD FIX ===== */
+/*  STUDENT DASHBOARD CARD FIX  */
 
 .mess-card {
   background: rgba(15, 23, 42, 0.85);

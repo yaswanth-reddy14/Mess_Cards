@@ -13,17 +13,21 @@ import cloudinary.api
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
+
+def _env_list(key, default=""):
+    raw = os.getenv(key, default)
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
 # SECURITY
 
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-key")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com",
-]
+ALLOWED_HOSTS = _env_list(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1,.onrender.com",
+)
 
 # APPLICATIONS
 
@@ -66,19 +70,17 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://mess-cards-xyrg.vercel.app",
-    "https://mess-cards-xyrg-om08zz4zg-yaswanth-reddy14s-projects.vercel.app",
-]
+CORS_ALLOWED_ORIGINS = _env_list(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,https://mess-cards-xyrg.vercel.app,https://mess-cards-xyrg-om08zz4zg-yaswanth-reddy14s-projects.vercel.app",
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "https://mess-cards-xyrg.vercel.app",
-    "https://mess-cards-xyrg-om08zz4zg-yaswanth-reddy14s-projects.vercel.app",
-]
+CSRF_TRUSTED_ORIGINS = _env_list(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:5173,https://mess-cards-xyrg.vercel.app,https://mess-cards-xyrg-om08zz4zg-yaswanth-reddy14s-projects.vercel.app",
+)
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -124,13 +126,22 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # DATABASE (Render / Local)
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=not DEBUG,
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -163,6 +174,15 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
+SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
+CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "False") == "True"
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = (
+    os.getenv("SECURE_HSTS_INCLUDE_SUBDOMAINS", "False") == "True"
+)
+SECURE_HSTS_PRELOAD = os.getenv("SECURE_HSTS_PRELOAD", "False") == "True"
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

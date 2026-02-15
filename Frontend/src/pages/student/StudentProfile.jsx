@@ -14,7 +14,7 @@ export default function StudentProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // 🔥 Delete account modal state
+  //  Delete account modal state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -75,11 +75,11 @@ export default function StudentProfile() {
       setNewPassword("");
       setConfirmPassword("");
     } catch {
-      // handled globally
+      
     }
   };
 
-  // DELETE ACCOUNT (PRO FLOW)
+  // DELETE ACCOUNT 
   const confirmDelete = async () => {
     try {
       setDeleting(true);
@@ -197,7 +197,7 @@ export default function StudentProfile() {
         </div>
       </div>
 
-      {/* 🔥 DELETE CONFIRM MODAL */}
+      {/*  DELETE CONFIRM MODAL */}
       {showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="modal-card danger">

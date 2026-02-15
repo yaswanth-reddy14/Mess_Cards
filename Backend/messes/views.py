@@ -8,8 +8,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-from .models import Mess, Menu
-from .serializers import MessSerializer, MenuSerializer
+from .models import Mess, Menu, MessPlan
+from .serializers import (
+    MessSerializer,
+    MenuSerializer,
+    MessPlanSerializer,   
+)
+
 from .permissions import IsOwner
 
 # MESS
@@ -99,3 +104,32 @@ class ToggleMessStatusView(APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+class MessPlanViewSet(viewsets.ModelViewSet):
+    serializer_class = MessPlanSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = MessPlan.objects.filter(
+            mess__id=self.kwargs["mess_id"]
+        ).prefetch_related("plan_items")
+        if user.role == "OWNER":
+            queryset = queryset.filter(mess__owner=user)
+        else:
+            queryset = queryset.filter(is_active=True)
+        return queryset.order_by("-created_at")
+
+    def perform_create(self, serializer):
+        mess = get_object_or_404(
+            Mess,
+            id=self.kwargs["mess_id"],
+            owner=self.request.user
+        )
+        serializer.save(mess=mess)
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [permissions.IsAuthenticated(), IsOwner()]
+        return [permissions.IsAuthenticated()]

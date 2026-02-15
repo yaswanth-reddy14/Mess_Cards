@@ -36,7 +36,7 @@ export default function EditMenu() {
     e.preventDefault();
 
     await api.put(`messes/${messId}/menus/${menuId}/`, {
-      day,                 //  FIX
+      day,                 
       name,
       price,
       meal_type: mealType,

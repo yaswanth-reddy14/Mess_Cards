@@ -34,7 +34,7 @@ export default function StudentMesses() {
             <div
               key={mess.id}
               className="card clickable student-mess-card"
-              onClick={() => navigate(`/student/messes/${mess.id}`)}
+              onClick={() => navigate(`/student/mess/${mess.id}`)}
             >
               {/* IMAGE */}
               <div className="mess-image-wrapper">

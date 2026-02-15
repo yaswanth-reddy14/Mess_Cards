@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from .models import Mess, Menu
+from .models import Mess, Menu, MessPlan
 
 
 class IsOwner(BasePermission):
@@ -10,6 +10,10 @@ class IsOwner(BasePermission):
 
         # If object IS a Menu  check mess owner
         if isinstance(obj, Menu):
+            return obj.mess.owner == request.user
+
+        # If object IS a MessPlan  check mess owner
+        if isinstance(obj, MessPlan):
             return obj.mess.owner == request.user
 
         return False

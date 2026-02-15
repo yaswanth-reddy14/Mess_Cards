@@ -64,7 +64,7 @@ export default function Register() {
     <div className="auth-container">
       <form className="auth-card" onSubmit={registerDirectly}>
 
-        {/* 🔙 BACK BUTTON */}
+        {/* BACK BUTTON */}
         <button
           type="button"
           className="back-btn"

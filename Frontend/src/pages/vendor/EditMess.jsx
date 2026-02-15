@@ -27,7 +27,7 @@ export default function EditMess() {
         setAddress(res.data.address);
         setLocation(res.data.location);
 
-        // 🔥 FIX: make image absolute URL
+        // FIX: make image absolute URL
         if (res.data.image) {
           setCurrentImage(
             res.data.image.startsWith("http")
@@ -57,7 +57,7 @@ export default function EditMess() {
         formData.append("image", image);
       }
 
-      // ❌ DO NOT set headers manually
+      //  DO NOT set headers manually
       await api.patch(`/messes/${messId}/`, formData);
 
       toast.success("Mess details updated successfully");

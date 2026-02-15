@@ -35,7 +35,7 @@ export default function VendorMenus() {
   }, [messId]);
 
   /*
-     DELETE FLOW (FIXED)
+     DELETE FLOW 
    */
 
   const requestDelete = (id) => {

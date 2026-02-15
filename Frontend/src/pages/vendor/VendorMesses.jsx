@@ -120,6 +120,13 @@ export default function VendorMesses() {
                 </button>
 
                 <button
+                  style={planBtn}
+                  onClick={() => navigate(`/vendor/${mess.id}/plans`)}
+                >
+                  Manage Plans
+                </button>
+
+                <button
                   style={editBtn}
                   onClick={() => navigate(`/vendor/${mess.id}/edit`)}
                 >
@@ -128,6 +135,7 @@ export default function VendorMesses() {
 
                 <button
                   style={deleteBtn}
+                  className="btn-danger"
                   onClick={() => {
                     setDeletingId(mess.id);
                     setShowDeleteConfirm(true);
@@ -238,7 +246,7 @@ const muted = {
 
 const actions = {
   display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
+  gridTemplateColumns: "repeat(2, 1fr)",
   gap: 10,
 };
 
@@ -257,6 +265,16 @@ const editBtn = {
   borderRadius: 10,
   border: "none",
   background: "#3b82f6",
+  color: "#fff",
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+const planBtn = {
+  padding: "8px",
+  borderRadius: 10,
+  border: "none",
+  background: "#8b5cf6",
   color: "#fff",
   fontWeight: 600,
   cursor: "pointer",
