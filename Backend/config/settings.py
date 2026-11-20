@@ -126,8 +126,18 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # DATABASE (Render / Local)
 
+# Temporary recovery mode for demos when a hosted PostgreSQL instance is unavailable.
+# Keeps DATABASE_URL untouched so it can be restored by disabling the flag.
+SQLITE_DEMO_MODE = os.getenv("SQLITE_DEMO_MODE", "False").strip().lower() in {"1", "true", "yes"}
 DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL:
+if SQLITE_DEMO_MODE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+elif DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
